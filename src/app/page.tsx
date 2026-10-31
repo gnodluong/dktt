@@ -179,7 +179,7 @@ export default async function Home() {
               <li>
                 <span className="n">01</span>
                 <span>
-                  <b>Đăng ký trước.</b> Gửi phiếu trước 20:00 hôm trước, hoặc
+                  <b>Đăng ký trước.</b> Gửi đăng ký trước 20:00 hôm trước, hoặc
                   gửi đơn đột xuất nếu có việc gấp.
                 </span>
               </li>
@@ -193,8 +193,9 @@ export default async function Home() {
               <li>
                 <span className="n">03</span>
                 <span>
-                  <b>Đến cổng đúng giờ.</b> Xuất trình phiếu (mã QR) và căn
-                  cước; số người đi cùng phải đúng như khai.
+                  <b>Đến cổng đúng giờ.</b> Mang theo căn cước, cho biết tên
+                  quân nhân và giờ đã đăng ký; số người đi cùng phải đúng như
+                  khai.
                 </span>
               </li>
             </ol>

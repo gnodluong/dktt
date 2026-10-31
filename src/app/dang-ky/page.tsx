@@ -47,8 +47,8 @@ export default async function RegisterPage({
             </Link>
             <h1>Đăng ký thăm thân</h1>
             <p className="lead">
-              Chọn quân nhân, ngày và giờ đến. Phiếu hiện ngay sau khi gửi; ban
-              chỉ huy đại đội xác nhận và bạn nhận thông báo trên điện thoại.
+              Chọn quân nhân, ngày và giờ đến. Sau khi gửi, bạn xem lại thông tin
+              vừa nhập và chờ ban chỉ huy đại đội duyệt.
             </p>
           </div>
 

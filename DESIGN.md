@@ -5,13 +5,13 @@ trong `src/app/globals.css`.
 
 ## Thế giới
 
-Sổ tiếp thân nhân ở cổng đơn vị: giấy in biểu mẫu, mực đóng dấu đỏ, số thứ tự in bằng
-kiểu chữ hẹp của biển hiệu, đường kẻ đôi dưới tiêu đề mục. Giao diện không mô phỏng giấy
-bằng hoa văn — nó dùng **nhịp của biểu mẫu**: đường kẻ, khoảng trắng, số thứ tự, chữ số
-condensed và một con dấu duy nhất.
+Sổ tiếp thân nhân ở cổng đơn vị: giấy in biểu mẫu, số thứ tự in bằng kiểu chữ hẹp của
+biển hiệu, đường kẻ đôi dưới tiêu đề mục. Giao diện không mô phỏng giấy bằng hoa văn — nó
+dùng **nhịp của biểu mẫu**: đường kẻ, khoảng trắng, số thứ tự và chữ số condensed.
 
-Chữ ký nhận diện: **phiếu hẹn có cuống xé** (đường kẻ đứt, hai lỗ bấm tròn) và **con dấu
-đỏ xoay −7°** chỉ xuất hiện khi phiếu đã được duyệt.
+Chữ ký nhận diện: **bảng hai ngày cuối tuần** với số ngày cỡ lớn và trạng thái mở/tạm dừng,
+đặt ngay dưới tiêu đề trang chủ. Không có phiếu, mã QR hay tem dán — sau khi gửi, thân nhân
+chỉ thấy lại thông tin đã nhập và trạng thái chờ duyệt.
 
 ## Màu
 
@@ -26,13 +26,13 @@ Sáng (mặc định) — bộ màu đơn vị: `#E0E2DB`, `#D2D4C8`, `#B8BDB5`,
 | Mực mờ | `#56605c` | ghi chú, placeholder | 5.0:1 |
 | Đường kẻ | `#c2c6bb` / `#889696` | viền 1px, kẻ đôi | — |
 | Xanh đơn vị | `#5f7470` | nút chính, nhấn | chữ trắng 4.9:1 |
-| Đỏ con dấu | `#9e4a3c` | từ chối, tạm dừng, con dấu | 5.0:1 |
+| Đỏ cảnh báo | `#9e4a3c` | từ chối, tạm dừng, lỗi | 5.0:1 |
 | Xanh đã duyệt | `#45664f` | đã duyệt, đã tiếp | 5.6:1 |
 | Hổ phách | `#75612f` | chờ duyệt | 5.2:1 |
 
 Tối: nền `#121715`, mặt `#1a211e`, mực `#e8ebe4`, nhấn `#a9bdb4`, đỏ `#dd9a8c`.
 Mọi tỉ lệ tương phản đều ≥ 4.5:1 cho chữ thân bài. Đỏ chỉ dùng cho tín hiệu trạng thái
-(từ chối, tạm dừng, con dấu), không dùng làm màu thương hiệu.
+(từ chối, tạm dừng, lỗi), không dùng làm màu thương hiệu.
 
 Không dùng màu làm dấu hiệu duy nhất: mỗi trạng thái luôn kèm chữ ("Chờ duyệt", "Đã duyệt").
 
@@ -58,17 +58,15 @@ Không dùng màu làm dấu hiệu duy nhất: mỗi trạng thái luôn kèm c
 
 - Bảng hai ngày cuối tuần ở đầu trang: số ngày cỡ 3–3.7rem, trạng thái bằng chữ, sọc chéo
   khi tạm dừng. Đây là câu trả lời đầu tiên của sản phẩm.
-- Con dấu: `rotate(-7deg)`, viền 2px kèm viền trong 1px, chỉ hiện trên phiếu.
-- Chuyển động duy nhất: bảng và nút chính trượt lên 10px khi tải (0.45s), con dấu "đóng"
-  0.5s khi phiếu vừa được duyệt. Tất cả tắt khi `prefers-reduced-motion`.
+- Chuyển động duy nhất: bảng và nút chính trượt lên 10px khi tải (0.45s). Tất cả tắt khi
+  `prefers-reduced-motion`.
 
 ## Thành phần
 
 | Thành phần | Quy tắc |
 |---|---|
 | `.board` | 2 cột, kẻ 1px, ngày lớn condensed, trạng thái bằng chữ + màu |
-| `.slip` | lưới `1fr 152px`; cuống xé có 2 lỗ bấm; mobile gập cuống xuống dưới |
-| `.stamp` | chỉ 3 biến thể: đã duyệt (đỏ), chờ duyệt (hổ phách), đã huỷ (xám) |
+| `.info-card` | khối xác nhận sau khi gửi: các dòng nhãn–giá trị, kẻ chấm, khối địa điểm |
 | `.seg` | chọn buổi/loại, núm chọn tô kín nền xanh quân phục |
 | `.day-opt` | chọn ngày, ô đã chọn có viền trong 1px |
 | `.queue-item` | hàng chờ duyệt: người, quân nhân, ngày, lý do, ghi chú, hai nút ngang nhau |

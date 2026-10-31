@@ -89,10 +89,10 @@ export async function decide(_prev: FormState | null, fd: FormData): Promise<For
     await notifyFamily(req.id, {
       title:
         next === "approved"
-          ? "Phiếu đã được duyệt"
+          ? "Đăng ký đã được duyệt"
           : next === "rejected"
-            ? "Phiếu chưa được duyệt"
-            : "Phiếu đã được huỷ",
+            ? "Đăng ký chưa được duyệt"
+            : "Đăng ký đã huỷ",
       body:
         next === "approved"
           ? `${req.soldier_name} · ${weekdayShort(req.visit_date)} ${monthDay(
@@ -101,7 +101,7 @@ export async function decide(_prev: FormState | null, fd: FormData): Promise<For
           : `${req.soldier_name} · ${weekdayShort(req.visit_date)} ${monthDay(
               req.visit_date,
             )} · ${timeText(req)}${note ? ` — ${note}` : ""}`,
-      url: `/phieu/${req.code}`,
+      url: `/dang-ky/ket-qua/${req.code}`,
       tag: `dktt-${req.code}`,
     });
   }
@@ -109,7 +109,7 @@ export async function decide(_prev: FormState | null, fd: FormData): Promise<For
   revalidatePath("/chi-huy");
   revalidatePath("/chi-huy/don");
   revalidatePath("/");
-  revalidatePath(`/phieu/${req.code}`);
+  revalidatePath(`/dang-ky/ket-qua/${req.code}`);
   return {
     ok: true,
     notice:

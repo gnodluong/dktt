@@ -13,8 +13,8 @@ export default function NotFound() {
             <Link href="/" className="btn btn-primary">
               Trang chủ
             </Link>
-            <Link href="/tra-cuu" className="btn btn-ghost">
-              Tra cứu phiếu
+            <Link href="/dang-ky" className="btn btn-ghost">
+              Đăng ký thăm thân
             </Link>
           </div>
         </div>

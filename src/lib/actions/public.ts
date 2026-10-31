@@ -159,7 +159,7 @@ export async function submitVisit(
     .maybeSingle();
   if (dup) {
     return fail(
-      `Số điện thoại này đã có phiếu cho ngày ${monthDay(v.visitDate)} (${dup.code}).`,
+      `Số điện thoại này đã đăng ký cho ngày ${monthDay(v.visitDate)}.`,
     );
   }
 
@@ -168,7 +168,7 @@ export async function submitVisit(
     .select("id", { count: "exact", head: true })
     .eq("phone", v.phone)
     .gte("created_at", new Date(Date.now() - 86_400_000).toISOString());
-  if ((recent ?? 0) >= 5) return fail("Số điện thoại này đã gửi quá nhiều phiếu trong 24 giờ.");
+  if ((recent ?? 0) >= 5) return fail("Số điện thoại này đã gửi quá nhiều đăng ký trong 24 giờ.");
 
   const { data: created, error } = await admin()
     .from("visit_requests")
@@ -200,12 +200,12 @@ export async function submitVisit(
     return fail(
       error?.message?.includes("column")
         ? "Hệ thống chưa cập nhật lược đồ giờ thăm (migration 0002)."
-        : "Chưa gửi được phiếu. Vui lòng thử lại sau ít phút.",
+        : "Chưa gửi được đăng ký. Vui lòng thử lại sau ít phút.",
     );
   }
 
   await notifyStaff({
-    title: kind === "urgent" ? "Đơn đột xuất mới" : "Phiếu đăng ký mới",
+    title: kind === "urgent" ? "Đơn đột xuất mới" : "Đăng ký mới",
     body: `${v.visitorName} (${v.relation}) · ${soldier.full_name} · ${weekdayShort(
       v.visitDate,
     )} ${monthDay(v.visitDate)} · ${timeText({ time_from: v.timeFrom, time_to: v.timeTo })}`,
@@ -213,5 +213,5 @@ export async function submitVisit(
     tag: "dktt-don-moi",
   });
 
-  redirect(`/phieu/${created.code}?moi=1`);
+  redirect(`/dang-ky/ket-qua/${created.code}?moi=1`);
 }

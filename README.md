@@ -11,7 +11,7 @@ ngay trên điện thoại.
 
 | Luồng | Ai làm | Kết quả |
 |---|---|---|
-| Đăng ký thăm cuối tuần | Thân nhân, không cần tài khoản | Phiếu hẹn có mã + QR, chờ chỉ huy duyệt |
+| Đăng ký thăm cuối tuần | Thân nhân, không cần tài khoản | Xem lại thông tin đã nhập, chờ chỉ huy duyệt |
 | Đăng ký đột xuất | Thân nhân, trong 3 ngày tới | Đơn có lý do, cần chỉ huy duyệt, suất giới hạn |
 | Duyệt / từ chối / ghi nhận đã tiếp | Chỉ huy, trực ban | Thân nhân nhận thông báo đẩy ngay |
 | Tạm dừng tiếp theo ngày | Chỉ huy | Khoá ngày đó, gửi thông báo cho toàn bộ hoặc từng lớp |
@@ -141,11 +141,12 @@ scripts/            sinh seed, sinh khoá VAPID, sinh icon, chụp ảnh kiểm 
 
 ## 8. Bảo mật và giới hạn đã biết
 
-- Thân nhân **không có tài khoản**: gửi phiếu qua server action, tra cứu bằng mã + 3 số cuối
-  điện thoại. Mã phiếu sinh ngẫu nhiên 4 ký tự hex kèm ngày, không đoán được hàng loạt.
+- Thân nhân **không có tài khoản**: gửi đăng ký qua server action; sau khi gửi chỉ xem lại
+  thông tin đã nhập và trạng thái duyệt — không có phiếu, mã QR hay thao tác in. Mã đăng ký
+  (`DK…`) chỉ dùng nội bộ để đối chiếu trong sổ.
 - Khoá `service_role` chỉ nằm ở server (server actions, route handlers); không có biến nào
   lộ khoá này ra trình duyệt.
-- Chống spam nhẹ: mỗi số điện thoại 1 phiếu/ngày, tối đa 5 lượt gửi/24 giờ, bẫy bot ẩn.
+- Chống spam nhẹ: mỗi số điện thoại 1 đăng ký/ngày, tối đa 5 lượt gửi/24 giờ, bẫy bot ẩn.
   Chưa có CAPTCHA — nếu bị spam thật thì thêm Turnstile.
 - `shortcut: giới hạn sức chứa đếm theo lượt duyệt, chưa trừ khi quá giờ; nâng cấp khi cần chặn theo khung giờ 15 phút.`
 - Ảnh giấy tờ cho đơn đột xuất: cột `proof_path` và bucket `chung-tu` đã có sẵn nhưng giao

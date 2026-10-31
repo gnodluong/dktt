@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     reminders += await notifyFamily(row.id as string, {
       title: "Ngày mai đến thăm",
       body: `${row.soldier_name} · ${timeText(row)}. Mang theo phiếu ${row.code}.`,
-      url: `/phieu/${row.code}`,
+      url: `/dang-ky/ket-qua/${row.code}`,
       tag: `dktt-nhac-${row.code}`,
     });
   }
