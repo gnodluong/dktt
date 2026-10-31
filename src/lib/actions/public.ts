@@ -1,10 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { z } from "zod";
 import { admin } from "@/lib/supabase/admin";
 import { getSettings } from "@/lib/data";
 import { notifyStaff } from "@/lib/push";
+import { RESULT_COOKIE, RESULT_COOKIE_OPTIONS } from "@/lib/session";
 import {
   addDays,
   isWeekend,
@@ -94,8 +96,11 @@ export async function submitVisit(
       );
     }
   } else {
+    // Đơn đột xuất: xin gặp ngoài lịch cuối tuần, chọn ngày bất kỳ trong 2 tuần tới.
     if (v.visitDate < today) return fail("Ngày đã qua.");
-    if (v.visitDate > addDays(today, 2)) return fail("Đăng ký đột xuất chỉ nhận trong 3 ngày tới.");
+    if (v.visitDate > addDays(today, 14)) {
+      return fail("Đơn đột xuất chỉ nhận trong 2 tuần tới.");
+    }
     if (!v.urgentReason || v.urgentReason.length < 10) {
       return fail("Nêu rõ lý do đột xuất (ít nhất 10 ký tự) để chỉ huy xét duyệt.");
     }
@@ -219,5 +224,35 @@ export async function submitVisit(
     tag: "dktt-don-moi",
   });
 
+  // Ghi nhớ mã trên thiết bị này để thân nhân mở lại được trang đăng ký.
+  const store = await cookies();
+  store.set(RESULT_COOKIE, created.code, RESULT_COOKIE_OPTIONS);
+
   redirect(`/dang-ky/ket-qua/${created.code}?moi=1`);
+}
+
+/** Mở lại trang đăng ký khi mất cookie: xác nhận bằng 4 số cuối điện thoại. */
+export async function unlockResult(
+  _prev: FormState | null,
+  fd: FormData,
+): Promise<FormState> {
+  const code = String(fd.get("code") ?? "").trim().toUpperCase();
+  const tail = String(fd.get("tail") ?? "").replace(/\D/g, "");
+  if (!code) return { error: "Thiếu mã đăng ký." };
+  if (tail.length < 3) return { error: "Nhập ít nhất 3 số cuối điện thoại." };
+
+  const { data } = await admin()
+    .from("visit_requests")
+    .select("code, phone")
+    .eq("code", code)
+    .maybeSingle();
+
+  if (!data) return { error: "Không tìm thấy đăng ký này." };
+  if (!String(data.phone).replace(/\D/g, "").endsWith(tail)) {
+    return { error: "Số điện thoại không khớp với đăng ký." };
+  }
+
+  const store = await cookies();
+  store.set(RESULT_COOKIE, data.code as string, RESULT_COOKIE_OPTIONS);
+  redirect(`/dang-ky/ket-qua/${data.code}`);
 }

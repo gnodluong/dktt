@@ -492,6 +492,41 @@ a.board-day:hover {
   font-weight: 600;
 }
 
+.recent-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.recent-line:hover {
+  background: var(--surface-2);
+}
+
+.recent-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.recent-main {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.recent-line svg {
+  margin-left: auto;
+  color: var(--muted);
+  flex: none;
+}
+
 /* ------------------------------------------------------------------ pieces */
 .actions {
   display: grid;

@@ -36,6 +36,8 @@ export function RegistrationForm({
   days,
   window: visitWindow,
   defaultDate,
+  minDate,
+  maxDate,
 }: {
   kind: "weekend" | "urgent";
   soldiers: Soldier[];
@@ -43,6 +45,8 @@ export function RegistrationForm({
   days: DayPick[];
   window: { start: string; end: string };
   defaultDate?: string;
+  minDate?: string;
+  maxDate?: string;
 }) {
   const [state, action, pending] = useActionState<FormState | null, FormData>(
     submitVisit,
@@ -111,7 +115,27 @@ export function RegistrationForm({
           <h2>Ngày và giờ đến</h2>
         </div>
 
-        {openCount === 0 ? (
+        {kind === "urgent" ? (
+          <div className="field" data-invalid={invalid("visitDate")}>
+            <label htmlFor="visitDate">
+              Ngày mong muốn <span className="req">*</span>
+            </label>
+            <input
+              id="visitDate"
+              name="visitDate"
+              type="date"
+              className="input"
+              min={minDate}
+              max={maxDate}
+              defaultValue={defaultDate ?? minDate}
+              required
+            />
+            {err("visitDate")}
+            <span className="hint">
+              Chọn bất kỳ ngày nào trong 2 tuần tới, kể cả ngày thường.
+            </span>
+          </div>
+        ) : openCount === 0 ? (
           <div className="alert" data-tone="error">
             <AlertCircle size={17} aria-hidden />
             <span>
@@ -328,7 +352,11 @@ export function RegistrationForm({
         Mang theo căn cước khi đến.
       </p>
 
-      <button type="submit" className="btn btn-primary btn-lg" disabled={pending || openCount === 0}>
+      <button
+        type="submit"
+        className="btn btn-primary btn-lg"
+        disabled={pending || (kind === "weekend" && openCount === 0)}
+      >
         {pending ? "Đang gửi…" : "Gửi đăng ký"}
         {pending ? null : <ArrowRight size={18} aria-hidden />}
       </button>

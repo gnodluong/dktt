@@ -12,7 +12,7 @@ ngay trên điện thoại.
 | Luồng | Ai làm | Kết quả |
 |---|---|---|
 | Đăng ký thăm cuối tuần | Thân nhân, không cần tài khoản | Xem lại thông tin đã nhập, chờ chỉ huy duyệt |
-| Đăng ký đột xuất | Thân nhân, trong 3 ngày tới | Đơn có lý do, cần chỉ huy duyệt, suất giới hạn |
+| Đơn đột xuất | Thân nhân, chọn ngày trong 2 tuần tới | Đơn có lý do, cần chỉ huy duyệt, suất giới hạn |
 | Duyệt / từ chối / ghi nhận đã tiếp | Chỉ huy, trực ban | Thân nhân nhận thông báo đẩy ngay |
 | Tạm dừng tiếp theo ngày | Chỉ huy | Khoá ngày đó, gửi thông báo cho toàn bộ hoặc từng lớp |
 | Lịch sử đăng ký | Chỉ huy | Sổ toàn bộ phiếu, lọc theo ngày và trạng thái, xuất CSV |
@@ -64,7 +64,7 @@ Sao chép `.env.example` thành `.env.local` rồi điền:
 | `SUPABASE_SECRET_KEY` | API key `sb_secret_…` — **chỉ dùng ở server** |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | cùng giá trị, để trình duyệt dùng |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | `npm run vapid` |
-| `VAPID_SUBJECT` | `mailto:` của đơn vị |
+| `VAPID_SUBJECT` | URL `https:` của ứng dụng (chuẩn Web Push, **không phải email**) |
 | `CRON_SECRET` | chuỗi ngẫu nhiên, dùng cho cron nhắc lịch |
 
 Khoá VAPID phải cố định: đổi khoá là mọi thiết bị phải bật thông báo lại.
@@ -79,6 +79,14 @@ npm run build    # kiểm tra bản production
 
 Trang thân nhân: `/` · `/dang-ky` · `/dang-ky/dot-xuat` · `/thong-bao`
 Bàn trực: `/chi-huy` (đăng nhập ở `/chi-huy/login`).
+
+### Xem lại đăng ký
+
+- Sau khi gửi, thiết bị được đặt cookie `dktt_dk`; trang chủ hiện dòng **Đăng ký gần đây**
+  để mở lại đúng trang đó, kèm trạng thái mới nhất.
+- Người khác mở cùng đường dẫn sẽ chỉ thấy ô nhập **4 số cuối điện thoại** đã dùng khi
+  đăng ký. Sai số thì không xem được — không có danh sách công khai.
+- Chỉ huy xem toàn bộ trong **Lịch sử** (kèm mã `DK…` để đối chiếu nội bộ).
 
 ## 4. Deploy Vercel
 

@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
+import { cookies } from "next/headers";
+import { CheckCircle2, Lock } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { RegistrationSummary } from "@/components/RegistrationSummary";
 import { PushToggle } from "@/components/PushToggle";
+import { UnlockForm } from "@/components/UnlockForm";
 import { getRequestByCode, getSettings } from "@/lib/data";
+import { RESULT_COOKIE } from "@/lib/session";
 import { STATUS_LABEL, type Status } from "@/lib/domain";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +37,11 @@ export default async function ResultPage({
 }) {
   const { code } = await params;
   const { moi } = await searchParams;
-  const [req, settings] = await Promise.all([getRequestByCode(code), getSettings()]);
+  const [req, settings, store] = await Promise.all([
+    getRequestByCode(code),
+    getSettings(),
+    cookies(),
+  ]);
 
   if (!req) {
     return (
@@ -52,6 +59,34 @@ export default async function ResultPage({
                 Về trang chủ
               </Link>
             </div>
+          </div>
+        </main>
+        <SiteFooter contact={settings.contact} />
+      </>
+    );
+  }
+
+  const allowed = store.get(RESULT_COOKIE)?.value === req.code;
+
+  if (!allowed) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="page-tight">
+          <div className="wrap stack">
+            <div className="stack-sm">
+              <p className="status-line" data-s="pending">
+                <Lock size={14} aria-hidden /> Đăng ký được bảo vệ
+              </p>
+              <h1 style={{ fontSize: "clamp(1.4rem,4vw,1.9rem)" }}>
+                Xác nhận để xem đăng ký
+              </h1>
+              <p className="lead">
+                Nhập 4 số cuối điện thoại đã dùng khi đăng ký. Trang này không
+                công khai cho người khác xem.
+              </p>
+            </div>
+            <UnlockForm code={req.code} />
           </div>
         </main>
         <SiteFooter contact={settings.contact} />
@@ -85,7 +120,7 @@ export default async function ResultPage({
               {req.status === "pending"
                 ? "Vui lòng chờ đại đội duyệt. Khi có kết quả, bạn sẽ nhận thông báo trên điện thoại."
                 : req.status === "approved" || req.status === "checked_in"
-                  ? `Mời bạn đến đúng ngày giờ đã đăng ký. Mang theo căn cước công dân.`
+                  ? "Mời bạn đến đúng ngày giờ đã đăng ký. Mang theo căn cước công dân."
                   : "Liên hệ ban chỉ huy đại đội nếu cần hỗ trợ thêm."}
             </p>
           </div>

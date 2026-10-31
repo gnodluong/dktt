@@ -1,13 +1,18 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { ArrowRight, Megaphone, MapPin, Phone } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
-import { getDays, getNotices, getSettings } from "@/lib/data";
+import { getDays, getNotices, getRequestByCode, getSettings } from "@/lib/data";
+import { RESULT_COOKIE } from "@/lib/session";
 import {
+  STATUS_LABEL,
   longDate,
   monthDay,
+  timeText,
   todayVN,
   upcomingWeekend,
   weekdayName,
+  weekdayShort,
 } from "@/lib/domain";
 
 export const dynamic = "force-dynamic";
@@ -27,11 +32,15 @@ function stateOf(day: { closed: boolean; loaded: number; capacity: number }) {
 export default async function Home() {
   const today = todayVN();
   const [sat, sun] = upcomingWeekend(today);
-  const [days, notices, settings] = await Promise.all([
+  const [days, notices, settings, store] = await Promise.all([
     getDays(3),
     getNotices(3),
     getSettings(),
+    cookies(),
   ]);
+
+  const lastCode = store.get(RESULT_COOKIE)?.value;
+  const recent = lastCode ? await getRequestByCode(lastCode) : null;
 
   const find = (d: string) =>
     days.find((x) => x.date === d) ?? {
@@ -123,9 +132,20 @@ export default async function Home() {
                 <ArrowRight size={18} aria-hidden />
               </Link>
               <Link href="/dang-ky/dot-xuat" className="btn btn-ghost btn-lg">
-                Đăng ký đột xuất
+                Đơn đột xuất
               </Link>
             </div>
+
+            {recent ? (
+              <Link href={`/dang-ky/ket-qua/${recent.code}`} className="recent-line">
+                <span className="recent-label">Đăng ký gần đây</span>
+                <span className="recent-main">
+                  {STATUS_LABEL[recent.status]} · {weekdayShort(recent.visit_date)}{" "}
+                  {monthDay(recent.visit_date)} · {timeText(recent)}
+                </span>
+                <ArrowRight size={16} aria-hidden />
+              </Link>
+            ) : null}
 
             <div className="facts">
               <span>

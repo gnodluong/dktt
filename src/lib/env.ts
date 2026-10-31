@@ -14,7 +14,7 @@ export const VAPID_PUBLIC =
 export const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY ?? "";
 
 export const VAPID_SUBJECT =
-  process.env.VAPID_SUBJECT ?? "mailto:daidoi5@example.com";
+  process.env.VAPID_SUBJECT ?? "https://dktt.vercel.app";
 
 export const CRON_SECRET = process.env.CRON_SECRET ?? "";
 
