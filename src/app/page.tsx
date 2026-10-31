@@ -214,8 +214,9 @@ export default async function Home() {
               <li>
                 <span className="n">01</span>
                 <span>
-                  <b>Đăng ký trước.</b> Gửi đăng ký trước 20:00 hôm trước, hoặc
-                  gửi đơn đột xuất nếu có việc gấp.
+                  <b>Đăng ký trước.</b> Gửi trước ít nhất{" "}
+                  {settings.minLeadDays} ngày để đơn vị chốt cơm; việc gấp dùng
+                  đơn đột xuất.
                 </span>
               </li>
               <li>

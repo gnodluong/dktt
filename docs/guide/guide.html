@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Hướng dẫn sử dụng · Tiếp thân nhân Đại đội 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#e0e2db; --paper2:#d2d4c8; --surface:#eceee7; --surface2:#dde0d7;
+    --ink:#1b2422; --ink2:#38433f; --muted:#56605c;
+    --line:#b8bdb5; --line2:#889696; --accent:#5f7470; --accent-ink:#f3f4ef;
+    --stamp:#9e4a3c; --warn:#75612f; --ok:#45664f;
+  }
+  *{box-sizing:border-box}
+  @page{size:A4;margin:0}
+  html,body{margin:0;padding:0;background:#fff;color:var(--ink);
+    font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .page{width:210mm;height:296mm;padding:13mm 15mm 12mm;position:relative;overflow:hidden;
+    page-break-after:always;background:var(--paper);display:flex;flex-direction:column;}
+  .page:last-child{page-break-after:auto}
+  .phead{display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:1px solid var(--line2);padding-bottom:5px;margin-bottom:7mm;
+    font-size:8pt;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .phead .right{font-family:"Barlow Condensed",sans-serif;font-size:11pt;letter-spacing:.06em}
+  .pfoot{position:absolute;left:15mm;right:15mm;bottom:7mm;display:flex;justify-content:space-between;
+    border-top:1px solid var(--line);padding-top:4px;font-size:7.5pt;color:var(--muted)}
+  h1,h2,h3{margin:0;line-height:1.1;letter-spacing:-.02em}
+  p{margin:0}
+  .kicker{font-size:8pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .lead{font-size:10.5pt;line-height:1.55;color:var(--ink2)}
+  .cond{font-family:"Barlow Condensed",sans-serif;font-variant-numeric:tabular-nums}
+
+  /* cover */
+  .cover{justify-content:space-between}
+  .cover-top{display:flex;justify-content:space-between;align-items:center}
+  .brand{display:flex;align-items:center;gap:9px}
+  .brand img{width:15mm;height:15mm;object-fit:contain}
+  .brand .n{font-weight:800;font-size:12pt;line-height:1.15}
+  .brand .s{font-size:7.5pt;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .cover h1{font-size:58pt;font-weight:800;letter-spacing:-.045em;line-height:.92;margin-top:4mm}
+  .cover h1 em{font-style:normal;color:var(--accent)}
+  .cover .sub{font-size:15pt;font-weight:600;color:var(--ink2);margin-top:3mm}
+  .cover .desc{font-size:10.5pt;line-height:1.6;color:var(--ink2);max-width:105mm;margin-top:5mm}
+  .cover-mid{display:grid;grid-template-columns:1fr 54mm;gap:10mm;align-items:end;margin-top:2mm}
+  .cover-mid .phone img{max-height:104mm;object-fit:cover;object-position:top}
+  .phone{background:#fff;border:1px solid var(--line2);border-radius:9mm;padding:2.4mm;
+    box-shadow:0 6px 18px rgba(27,36,34,.18)}
+  .phone img{display:block;width:100%;border-radius:7mm}
+  .cover-qr{display:flex;gap:6mm;align-items:center;border:1px solid var(--line2);
+    border-radius:3mm;padding:5mm;background:var(--surface);margin-top:6mm}
+  .cover-qr img{width:30mm;height:30mm;background:#fff;border-radius:2mm;padding:1mm}
+  .cover-qr .t{font-size:13pt;font-weight:800;letter-spacing:-.02em}
+  .cover-qr .u{font-family:"Barlow Condensed",sans-serif;font-size:14pt;letter-spacing:.04em;color:var(--accent)}
+  .cover-qr .m{font-size:8.5pt;color:var(--muted);margin-top:2mm;line-height:1.5}
+  .cover-foot{display:flex;justify-content:space-between;align-items:flex-end;
+    border-top:2px solid var(--line2);padding-top:4mm;font-size:8.5pt;color:var(--ink2)}
+
+  /* sections */
+  .stitle{display:flex;align-items:baseline;gap:10px;margin-bottom:2mm}
+  .stitle .n{font-family:"Barlow Condensed",sans-serif;font-size:26pt;color:var(--accent);line-height:1}
+  .stitle h2{font-size:22pt;font-weight:800}
+  .sdesc{font-size:10pt;color:var(--ink2);line-height:1.5;margin-bottom:5mm;max-width:150mm}
+
+  .steps{display:grid;gap:4.5mm}
+  .step{display:grid;grid-template-columns:9mm 1fr;gap:4mm;align-items:start;
+    border-top:1px solid var(--line);padding-top:3.5mm}
+  .step .num{width:9mm;height:9mm;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+    display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:12pt}
+  .step h3{font-size:12pt;font-weight:700;margin-bottom:1.2mm}
+  .step p{font-size:9.2pt;line-height:1.55;color:var(--ink2)}
+  .step b{color:var(--ink)}
+
+  .two-phones{display:grid;grid-template-columns:1fr 1fr;gap:9mm;align-items:start;margin-top:4mm}
+  .two-phones .phone img{height:122mm;object-fit:cover;object-position:top}
+  .cap{font-size:8pt;color:var(--muted);text-align:center;margin-top:2mm}
+
+  .rule-table{width:100%;border-collapse:collapse;margin-top:1mm}
+  .rule-table th{ text-align:left;font-size:8pt;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);border-bottom:1px solid var(--line2);padding:2mm 2mm}
+  .rule-table td{border-bottom:1px solid var(--line);padding:2.6mm 2mm;font-size:9.4pt;line-height:1.45;vertical-align:top}
+  .rule-table td:first-child{width:42mm;font-weight:700;color:var(--ink)}
+  .rule-table td span{color:var(--ink2)}
+  .tag{display:inline-block;font-size:7pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    border:1px solid var(--line2);border-radius:999px;padding:1px 6px;color:var(--muted)}
+  .tag.red{border-color:var(--stamp);color:var(--stamp)}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:8mm}
+  .card{background:var(--surface);border:1px solid var(--line2);border-radius:3mm;padding:5mm}
+  .card h3{font-size:10.5pt;margin-bottom:2mm}
+  .card p,.card li{font-size:8.6pt;line-height:1.5;color:var(--ink2)}
+  .card ul{margin:0;padding-left:4.5mm}
+  .card li+li{margin-top:1.2mm}
+
+  .shot{background:#fff;border:1px solid var(--line2);border-radius:3mm;padding:1.6mm;
+    box-shadow:0 5px 16px rgba(27,36,34,.14)}
+  .shot img{display:block;width:100%;border-radius:2mm}
+
+  .checklist{display:grid;gap:2.6mm;margin-top:1mm}
+  .checklist .row{display:grid;grid-template-columns:6mm 1fr;gap:3mm;align-items:start}
+  .checklist .dot{width:6mm;height:6mm;border:1.5px solid var(--accent);border-radius:50%;margin-top:.6mm}
+  .checklist .row p{font-size:9pt;line-height:1.5;color:var(--ink2)}
+  .checklist .row b{color:var(--ink)}
+
+  .contact{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:4mm}
+  .contact .box{background:var(--surface);border:1px solid var(--line2);border-radius:3mm;padding:5mm}
+  .contact .k{font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .contact .v{font-size:12pt;font-weight:700;margin-top:1.5mm;line-height:1.35}
+  .contact .s{font-size:8.5pt;color:var(--muted);margin-top:1mm}
+
+  .note{background:var(--surface2);border-left:0;border:1px solid var(--line2);border-radius:2mm;
+    padding:3.5mm 4mm;font-size:8.8pt;line-height:1.5;color:var(--ink2);margin-top:4mm}
+  .note b{color:var(--ink)}
+  .big{font-size:11pt;line-height:1.5}
+  .toc{display:grid;grid-template-columns:1fr 1fr;gap:2mm 8mm;margin-top:7mm;font-size:9.5pt;color:var(--ink2)}
+  .toc div{display:flex;align-items:baseline;gap:4mm;border-bottom:1px solid var(--line);padding-bottom:1.5mm}
+  .toc span{font-family:"Barlow Condensed",sans-serif;font-size:12pt;color:var(--accent);min-width:6mm}
+  .facts-band{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line2);border-radius:3mm;background:var(--surface);overflow:hidden}
+  .facts-band .f{padding:4mm;border-right:1px solid var(--line)}
+  .facts-band .f:last-child{border-right:0}
+  .facts-band .v{font-family:"Barlow Condensed",sans-serif;font-size:19pt;font-weight:600;line-height:1}
+  .facts-band .k{font-size:7.5pt;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:1.2mm}
+  .flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5mm;margin-top:3mm}
+  .flow .s{border-top:2px solid var(--accent);padding-top:2.5mm}
+  .flow .n{font-family:"Barlow Condensed",sans-serif;font-size:15pt;color:var(--accent);line-height:1}
+  .flow b{display:block;font-size:9.8pt;margin:.6mm 0 1mm}
+  .flow span{font-size:8.4pt;color:var(--ink2);line-height:1.45}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ 1. BÌA -->
+<section class="page cover">
+  <div>
+    <div class="cover-top">
+      <div class="brand">
+        <img src="../../public/logo.png" alt="">
+        <div>
+          <div class="n">Đại đội 5</div>
+          <div class="s">Tiểu đoàn 2 · Cao đẳng Hậu cần 2</div>
+        </div>
+      </div>
+      <div class="kicker">Hướng dẫn sử dụng · 2026</div>
+    </div>
+
+    <h1>Tiếp<br>thân nhân<em>.</em></h1>
+    <div class="sub">Sổ đăng ký thăm thân trực tuyến</div>
+    <p class="desc">Dành cho thân nhân quân nhân và ban chỉ huy đại đội: đăng ký trước,
+      đại đội duyệt, nhận thông báo ngay trên điện thoại — không cần tài khoản, không cần giấy tờ.</p>
+    <div class="toc"><div><span>01</span> Thân nhân đăng ký</div><div><span>02</span> Quy định cần biết</div><div><span>03</span> Cài app &amp; thông báo</div><div><span>04</span> Ban chỉ huy</div><div><span>05</span> Hỏi đáp &amp; liên hệ</div></div>
+  </div>
+
+  <div>
+    <div class="cover-mid">
+      <div>
+        <div class="cover-qr">
+          <img src="assets/qr.png" alt="Mã QR trang đăng ký">
+          <div>
+            <div class="t">Mở bằng điện thoại</div>
+            <div class="u">dangkydd5.vercel.app</div>
+            <div class="m">Quét mã để mở trang đăng ký.<br>Lưu vào Màn hình chính để nhận thông báo.</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone"><img src="assets/home.png" alt="Trang chủ"></div>
+    </div>
+
+    <div class="cover-foot">
+      <div>
+        <b>Số 50 Lê Văn Việt</b> · Liên hệ: Lê Văn Mạnh — 0964180478<br>
+        Trường Cao đẳng Hậu cần 2 · Tiểu đoàn 2 · Đại đội 5
+      </div>
+      <div class="cond" style="font-size:12pt;color:var(--muted)">01 / 07</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================== 2. THÂN NHÂN -->
+<section class="page">
+  <div class="phead"><span>Phần 1 · Dành cho thân nhân</span><span class="right">Tiếp thân nhân · Đại đội 5</span></div>
+
+  <div class="stitle"><span class="n">01</span><h2>Đăng ký thăm trong 2 phút</h2></div>
+  <p class="sdesc">Không cần tạo tài khoản. Chỉ cần điện thoại có mạng, làm lần lượt 4 bước dưới đây.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="num">1</div>
+      <div>
+        <h3>Mở trang và xem lịch</h3>
+        <p>Vào <b>dangkydd5.vercel.app</b>. Hai ô lớn cho biết thứ Bảy và Chủ nhật tuần này có
+        mở tiếp hay không: <b>Mở đăng ký</b>, <b>Hết hạn đăng ký</b> hoặc <b>Tạm dừng tiếp</b>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num">2</div>
+      <div>
+        <h3>Chọn quân nhân, ngày và giờ</h3>
+        <p>Bấm <b>Đăng ký thăm thân</b>. Chọn lớp rồi gõ tên quân nhân (gõ không dấu cũng được).
+        Chọn ngày còn mở, sau đó chọn <b>Từ giờ</b> và <b>Đến giờ</b> trong khung 08:30–15:00.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-phones" style="margin-top:6mm">
+    <div>
+      <div class="phone"><img src="assets/home.png" alt="Trang chủ"></div>
+      <div class="cap">Trang chủ: lịch hai ngày cuối tuần</div>
+    </div>
+    <div>
+      <div class="phone"><img src="assets/register-top.png" alt="Chọn quân nhân và ngày"></div>
+      <div class="cap">Chọn lớp, tìm tên và chọn ngày</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Mẹo:</b> chọn lớp trước khi gõ tên để danh sách ngắn hơn. Gõ không dấu vẫn tìm được
+    (“tran quang hung”). Nếu ngày gần nhất bị khoá, chọn ngày xa hơn — đơn vị cần báo trước 2 ngày.
+  </div>
+  <div class="pfoot"><span>Đại đội 5 · Tiểu đoàn 2 · Trường Cao đẳng Hậu cần 2</span><span>02 / 07</span></div>
+</section>
+
+<!-- ============================================ 3. THÂN NHÂN (tiếp) -->
+<section class="page">
+  <div class="phead"><span>Phần 1 · Dành cho thân nhân</span><span class="right">Tiếp thân nhân · Đại đội 5</span></div>
+
+  <div class="steps" style="margin-top:1mm">
+    <div class="step">
+      <div class="num">3</div>
+      <div>
+        <h3>Điền thông tin người đến thăm</h3>
+        <p>Họ tên, quan hệ với quân nhân, số điện thoại, số người đi cùng, căn cước và nội dung
+        cần trao đổi. Kiểm tra lại rồi bấm <b>Gửi đăng ký</b>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num">4</div>
+      <div>
+        <h3>Chờ đại đội duyệt</h3>
+        <p>Màn hình hiện <b>Cảm ơn bạn đã đăng ký</b> kèm lại đúng thông tin đã nhập và trạng thái
+        <b>Đang chờ đại đội duyệt</b>. Không cần làm gì thêm.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:5mm;align-items:start">
+    <div>
+      <div class="phone"><img src="assets/register-form.png" alt="Nhập thông tin người đến thăm"></div>
+      <div class="cap">Thông tin người đến thăm</div>
+    </div>
+    <div>
+      <div class="phone"><img src="assets/confirm.png" alt="Xác nhận đăng ký"></div>
+      <div class="cap">Xác nhận sau khi gửi</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Nhập sai thì sửa, không mất dữ liệu.</b> Nếu có ô chưa đúng, hệ thống báo đỏ ngay ô đó và
+    <b>giữ nguyên</b> những gì bạn đã nhập để sửa. Muốn nhập lại từ đầu, bấm <b>Làm lại</b>.
+  </div>
+
+  <div class="pfoot"><span>Đại đội 5 · Tiểu đoàn 2 · Trường Cao đẳng Hậu cần 2</span><span>03 / 07</span></div>
+</section>
+
+<!-- ================================================== 4. QUY ĐỊNH -->
+<section class="page">
+  <div class="phead"><span>Phần 2 · Quy định cần biết</span><span class="right">Tiếp thân nhân · Đại đội 5</span></div>
+
+  <div class="stitle"><span class="n">02</span><h2>Quy định tiếp thân nhân</h2></div>
+  <p class="sdesc">Áp dụng cho mọi đăng ký thứ Bảy, Chủ nhật. Ban chỉ huy có thể điều chỉnh
+    khung giờ và số ngày báo trước trong mục Cài đặt.</p>
+
+  <table class="rule-table">
+    <tr><th>Nội dung</th><th>Quy định</th></tr>
+    <tr><td>Ngày tiếp</td><td><span>Thứ Bảy và Chủ nhật hằng tuần. Ngày khác chỉ nhận đơn đột xuất.</span></td></tr>
+    <tr><td>Khung giờ</td><td><span>08:30 – 15:00. Thân nhân chọn khoảng 30 phút trong khung này.</span></td></tr>
+    <tr><td>Báo trước</td><td><span><b>Ít nhất 2 ngày</b> để đơn vị chốt cơm và chuẩn bị. Đăng ký sát 1 ngày <b>không nhận</b>.</span></td></tr>
+    <tr><td>Số lượt</td><td><span>Không giới hạn lượt đăng ký trong ngày.</span></td></tr>
+    <tr><td>Đơn đột xuất</td><td><span>Dùng khi cần gặp ngoài lịch cuối tuần: chọn ngày bất kỳ trong <b>2 tuần tới</b>,
+      nêu rõ lý do, chờ chỉ huy duyệt. Giới hạn 6 suất/ngày.</span></td></tr>
+    <tr><td>Tạm dừng tiếp</td><td><span>Khi đơn vị bận, ban chỉ huy đăng thông báo — có thể tạm dừng
+      <b>toàn đơn vị</b> hoặc <b>một lớp</b>. Ngày đó hệ thống khoá đăng ký.</span></td></tr>
+    <tr><td>Khi đến cổng</td><td><span>Mang <b>căn cước công dân</b>, đến đúng giờ và đúng số người đã khai;
+      cho biết tên quân nhân. Trực ban đối chiếu danh sách đã duyệt.</span></td></tr>
+  </table>
+
+  <div class="cols" style="margin-top:6mm">
+    <div class="card">
+      <h3>Vì sao phải báo trước 2 ngày?</h3>
+      <p>Đơn vị phải chốt số suất ăn và bố trí người đón tiếp. Đăng ký sát ngày sẽ không kịp
+        chuẩn bị, nên hệ thống tự khoá. Nếu có việc gấp, dùng <b>đơn đột xuất</b> để chỉ huy xét riêng.</p>
+    </div>
+    <div class="card">
+      <h3>Đổi hoặc huỷ đăng ký</h3>
+      <p>Hệ thống chưa có nút huỷ. Cần đổi ngày, đổi số người hoặc huỷ, gọi trực ban đại đội:
+        <b>0964180478</b> (Lê Văn Mạnh) và đọc tên quân nhân + số điện thoại đã đăng ký.</p>
+    </div>
+  </div>
+
+  <div class="facts-band" style="margin-top:6mm">
+    <div class="f"><div class="v">08:30–15:00</div><div class="k">Khung giờ thăm</div></div>
+    <div class="f"><div class="v">2 ngày</div><div class="k">Báo trước tối thiểu</div></div>
+    <div class="f"><div class="v">0</div><div class="k">Giới hạn lượt</div></div>
+    <div class="f"><div class="v">6</div><div class="k">Suất đột xuất/ngày</div></div>
+  </div>
+
+  <div class="flow" style="margin-top:6mm">
+    <div class="s"><div class="n">01</div><b>Xuất trình căn cước</b><span>Cho biết tên quân nhân và giờ đã đăng ký.</span></div>
+    <div class="s"><div class="n">02</div><b>Đối chiếu danh sách</b><span>Trực ban kiểm tra đăng ký đã được duyệt.</span></div>
+    <div class="s"><div class="n">03</div><b>Vào đúng giờ</b><span>Đúng số người đã khai, không tự ý thêm.</span></div>
+  </div>
+  <div class="pfoot"><span>Đại đội 5 · Tiểu đoàn 2 · Trường Cao đẳng Hậu cần 2</span><span>04 / 07</span></div>
+</section>
+
+<!-- ============================================== 5. CÀI APP / PUSH -->
+<section class="page">
+  <div class="phead"><span>Phần 3 · Nhận thông báo</span><span class="right">Tiếp thân nhân · Đại đội 5</span></div>
+
+  <div class="stitle"><span class="n">03</span><h2>Cài app để nhận thông báo</h2></div>
+  <p class="sdesc">Trên điện thoại, thông báo chỉ hoạt động khi ứng dụng được thêm vào Màn hình chính —
+    <b>bắt buộc với iPhone</b>. Thêm một lần, dùng mãi.</p>
+
+  <div style="display:grid;grid-template-columns:62mm 1fr;gap:10mm;align-items:start;margin-top:2mm">
+    <div>
+      <div class="phone"><img src="assets/install.png" alt="Hướng dẫn cài trên iPhone"></div>
+      <div class="cap">Bảng hướng dẫn tự hiện trên điện thoại</div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:5mm">
+        <h3>iPhone / iPad — Safari hoặc Chrome</h3>
+        <ol style="margin:0;padding-left:5mm;font-size:9pt;line-height:1.6;color:var(--ink2)">
+          <li>Mở <b>Safari</b> hoặc <b>Chrome</b>, vào <b>dangkydd5.vercel.app</b>.</li>
+          <li>Safari: bấm <b>Chia sẻ</b> ở thanh dưới. Chrome: bấm <b>⋮</b> → <b>Chia sẻ</b>.</li>
+          <li>Chọn <b>Thêm vào Màn hình chính</b> (Add to Home Screen).</li>
+          <li>Mở app từ biểu tượng vừa thêm, vào <b>Cài đặt</b> và bật thông báo.</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3>Android — Chrome</h3>
+        <ol style="margin:0;padding-left:5mm;font-size:9pt;line-height:1.6;color:var(--ink2)">
+          <li>Mở <b>Chrome</b>, vào <b>dangkydd5.vercel.app</b>.</li>
+          <li>Bấm <b>⋮</b> ở góc trên → <b>Cài đặt ứng dụng</b> (hoặc <b>Thêm vào Màn hình chính</b>).</li>
+          <li>Mở app từ biểu tượng và bật thông báo.</li>
+        </ol>
+      </div>
+
+      <div class="note" style="margin-top:5mm">
+        <b>Không thấy thông báo?</b> Kiểm tra: app đã nằm trên Màn hình chính và đang mở từ biểu tượng đó;
+        quyền thông báo của trình duyệt đang <b>Cho phép</b>. Trên iPhone phải dùng iOS 16.4 trở lên.
+      </div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:6mm">
+    <b>Thân nhân</b> bật thông báo ngay trên trang xác nhận sau khi gửi đăng ký.
+    <b>Chỉ huy</b> bật trong <b>Cài đặt → Thông báo đẩy trên thiết bị này</b>, rồi bấm
+    <b>Gửi thông báo thử</b> để kiểm tra.
+  </div>
+
+  <div class="cols" style="margin-top:5mm">
+    <div class="card"><h3>Thân nhân bật ở đâu?</h3><p>Sau khi gửi đăng ký, ở trang xác nhận bấm <b>Bật thông báo đẩy</b> và chọn <b>Cho phép</b>.</p></div>
+    <div class="card"><h3>Chỉ huy bật ở đâu?</h3><p><b>Cài đặt → Thông báo đẩy trên thiết bị này → Bật</b>, rồi bấm <b>Gửi thông báo thử</b>.</p></div>
+  </div>
+  <div class="pfoot"><span>Đại đội 5 · Tiểu đoàn 2 · Trường Cao đẳng Hậu cần 2</span><span>05 / 07</span></div>
+</section>
+
+<!-- ================================================= 6. CHỈ HUY -->
+<section class="page">
+  <div class="phead"><span>Phần 4 · Dành cho ban chỉ huy</span><span class="right">Tiếp thân nhân · Đại đội 5</span></div>
+
+  <div class="stitle"><span class="n">04</span><h2>Bàn trực chỉ huy</h2></div>
+  <p class="sdesc">Đăng nhập bằng <b>họ tên</b> (ví dụ “Lê Văn Mạnh”) hoặc tên viết liền, cùng mật khẩu
+    được cấp. Ba tài khoản: Đại đội trưởng, Chính trị viên, Phó Đại đội trưởng.</p>
+
+  <div class="shot" style="margin-top:1mm"><img src="assets/dashboard.png" alt="Bàn trực"></div>
+  <div class="cap" style="text-align:left;margin-top:1.5mm">Tổng quan: 5 chỉ số, hàng chờ duyệt, lịch 6 ngày tới và lịch sử gần đây</div>
+
+  <div class="cols" style="margin-top:5mm">
+    <div class="card">
+      <h3>Duyệt trong 1 chạm</h3>
+      <ul>
+        <li>Mỗi đơn hiện người đến, quân nhân, ngày, giờ, số người và lý do.</li>
+        <li>Ghi chú (không bắt buộc) rồi bấm <b>Duyệt</b> hoặc <b>Từ chối</b>.</li>
+        <li>Thân nhân nhận thông báo ngay, kèm địa chỉ và số liên hệ.</li>
+        <li>Ngày tiếp: bấm <b>Đã tiếp</b> để ghi nhận.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Lịch sử &amp; báo cáo</h3>
+      <ul>
+        <li>Mục <b>Lịch sử</b>: toàn bộ đăng ký, lọc theo trạng thái và ngày.</li>
+        <li>Bấm <b>Xuất CSV</b> để mở bằng Excel.</li>
+        <li>Mã <b>DK…</b> dùng đối chiếu nội bộ, không cần đưa cho thân nhân.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="cols" style="margin-top:5mm">
+    <div class="card">
+      <h3>Thông báo tạm dừng</h3>
+      <ul>
+        <li>Chọn ngày bắt đầu – kết thúc, nhập lý do.</li>
+        <li>Tick lớp bị ảnh hưởng; không tick = toàn đơn vị.</li>
+        <li>Tick <b>Gửi thông báo đẩy</b> để báo ngay cho thân nhân.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Quân nhân, lớp &amp; cài đặt</h3>
+      <ul>
+        <li><b>Lớp &amp; tiểu đội</b>: tạo lớp mới, thêm tiểu đội, tạm ẩn.</li>
+        <li><b>Quân nhân</b>: thêm/sửa từng người; nhập từ Excel hoặc Word (có file mẫu).</li>
+        <li><b>Cài đặt</b>: khung giờ thăm, giới hạn lượt, số ngày báo trước, thông báo đẩy.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pfoot"><span>Đại đội 5 · Tiểu đoàn 2 · Trường Cao đẳng Hậu cần 2</span><span>06 / 07</span></div>
+</section>
+
+<!-- ================================================== 7. FAQ -->
+<section class="page">
+  <div class="phead"><span>Phần 5 · Hỗ trợ</span><span class="right">Tiếp thân nhân · Đại đội 5</span></div>
+
+  <div class="stitle"><span class="n">05</span><h2>Câu hỏi thường gặp</h2></div>
+
+  <div class="checklist" style="margin-top:2mm">
+    <div class="row"><div class="dot"></div><p><b>Không thấy đăng ký của mình ở đâu?</b><br>
+      Mở lại web trên đúng điện thoại đã gửi: trang chủ có dòng <b>Đăng ký gần đây</b>.
+      Nếu đổi máy, mở link trong tin nhắn duyệt và nhập <b>4 số cuối điện thoại</b> đã dùng.</p></div>
+    <div class="row"><div class="dot"></div><p><b>Không đăng ký được ngày thứ Bảy này?</b><br>
+      Đã quá hạn báo trước 2 ngày, hoặc ngày đó đơn vị tạm dừng tiếp, hoặc lớp của quân nhân bị tạm dừng.
+      Chọn ngày xa hơn; việc gấp thì gửi <b>đơn đột xuất</b>.</p></div>
+    <div class="row"><div class="dot"></div><p><b>Gửi rồi mà không thấy thông báo duyệt?</b><br>
+      Ứng dụng chưa được thêm vào Màn hình chính, hoặc chưa bật quyền thông báo.
+      Xem lại Phần 3. Trong lúc chờ, mở web để xem trạng thái mới nhất.</p></div>
+    <div class="row"><div class="dot"></div><p><b>Đăng ký giúp người khác được không?</b><br>
+      Được. Chỉ cần nhập đúng số điện thoại của người sẽ đến; mọi thông báo gửi về thiết bị đã bật.</p></div>
+    <div class="row"><div class="dot"></div><p><b>Có mất phí không?</b><br>
+      Không. Đăng ký và nhận thông báo hoàn toàn miễn phí; chỉ cần điện thoại có mạng.</p></div>
+  </div>
+
+  <div class="contact">
+    <div class="box">
+      <div class="k">Địa điểm tiếp</div>
+      <div class="v">Số 50 Lê Văn Việt</div>
+      <div class="s">Trường Cao đẳng Hậu cần 2 · Tiểu đoàn 2 · Đại đội 5</div>
+    </div>
+    <div class="box">
+      <div class="k">Liên hệ ban chỉ huy</div>
+      <div class="v">Lê Văn Mạnh</div>
+      <div class="s">Đại đội trưởng · <b>0964180478</b></div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:5mm">
+    <b>Lưu ý bảo mật:</b> mỗi đăng ký chỉ mở được trên thiết bị đã gửi. Người khác mở link sẽ phải
+    nhập 4 số cuối điện thoại của người đăng ký — hệ thống không có danh sách công khai.
+  </div>
+
+  <div class="flow" style="margin-top:7mm">
+    <div class="s"><div class="n">01</div><b>Gửi đăng ký</b><span>Chọn quân nhân, ngày và giờ trong khung thăm.</span></div>
+    <div class="s"><div class="n">02</div><b>Đại đội duyệt</b><span>Chỉ huy duyệt và gửi thông báo về máy.</span></div>
+    <div class="s"><div class="n">03</div><b>Đến đúng giờ</b><span>Mang căn cước, đúng số người đã khai.</span></div>
+  </div>
+  <div style="margin-top:auto;margin-bottom:12mm;display:flex;justify-content:space-between;align-items:flex-end;border-top:2px solid var(--line2);padding-top:4mm">
+    <div>
+      <div class="kicker">Trang đăng ký</div>
+      <div class="cond" style="font-size:18pt;color:var(--accent)">dangkydd5.vercel.app</div>
+    </div>
+    <img src="assets/qr.png" alt="Mã QR" style="width:24mm;height:24mm;background:#fff;padding:1mm;border-radius:2mm">
+  </div>
+
+  <div class="pfoot"><span>Đại đội 5 · Tiểu đoàn 2 · Trường Cao đẳng Hậu cần 2</span><span>07 / 07</span></div>
+</section>
+
+</body>
+</html>

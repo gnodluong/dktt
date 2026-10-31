@@ -5,6 +5,7 @@ Trường Cao đẳng Hậu cần 2. Thân nhân đăng ký trước, chỉ huy 
 ngay trên điện thoại.
 
 - Next.js 16 (App Router) · Supabase (Postgres, Auth) · Web Push (VAPID) · Vercel
+- **Hướng dẫn sử dụng (PDF, 7 trang):** [docs/guide/Huong-dan-Tiep-than-nhan-Dai-doi-5.pdf](docs/guide/Huong-dan-Tiep-than-nhan-Dai-doi-5.pdf)
 - Giao diện tiếng Việt, mobile-first, sáng/tối theo hệ thống.
 
 ## Việc app làm
