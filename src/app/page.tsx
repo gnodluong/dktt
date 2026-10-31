@@ -20,12 +20,15 @@ export const dynamic = "force-dynamic";
 function stateOf(day: { closed: boolean; loaded: number; capacity: number }) {
   if (day.closed)
     return { state: "closed", text: "Tạm dừng tiếp", sub: "Theo thông báo của đơn vị" };
-  if (day.loaded >= day.capacity)
+  const limited = day.capacity > 0;
+  if (limited && day.loaded >= day.capacity)
     return { state: "full", text: "Đã đủ lượt", sub: `${day.loaded}/${day.capacity} lượt` };
   return {
     state: "open",
     text: "Mở đăng ký",
-    sub: `${day.loaded}/${day.capacity} lượt đã duyệt`,
+    sub: limited
+      ? `${day.loaded}/${day.capacity} lượt đã duyệt`
+      : `${day.loaded} lượt đã đăng ký`,
   };
 }
 

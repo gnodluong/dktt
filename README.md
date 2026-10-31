@@ -23,7 +23,8 @@ Quy tắc mặc định (sửa được trong bảng `settings`):
 
 - **Thứ Bảy và Chủ nhật mở tiếp hằng tuần.** Không cần bật gì.
 - Đăng ký ngày mai đóng lúc **20:00 hôm trước** (`cutoff_hour`).
-- **40 lượt/ngày** (`capacity.weekend`), **6 suất đột xuất/ngày** (`capacity.urgent`).
+- **Không giới hạn lượt cuối tuần** (`capacity.weekend = 0`); đặt số dương nếu muốn chặn.
+  **6 suất đột xuất/ngày** (`capacity.urgent`).
 - Ngày bị thông báo tạm dừng thì không nhận phiếu, kể cả phiếu đã có sẵn.
 - **Khung giờ thăm 08:30 – 15:00** (`visit_window`), ban chỉ huy sửa trong *Cài đặt*.
   Thân nhân chọn khoảng 30 phút trong khung đó khi đăng ký; không giới hạn số người đi cùng.

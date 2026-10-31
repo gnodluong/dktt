@@ -122,26 +122,28 @@ export default async function DashboardPage() {
             ) : (
               <div className="day-loads">
                 {upcoming.map((day) => {
-                  const pct = Math.min(
-                    100,
-                    Math.round((day.loaded / Math.max(1, day.capacity)) * 100),
-                  );
+                  const limited = day.capacity > 0;
+                  const pct = limited
+                    ? Math.min(100, Math.round((day.loaded / day.capacity) * 100))
+                    : 0;
                   return (
                     <div key={day.date} className="day-load">
                       <span className="dl-name">
                         {weekdayName(day.date)} {monthDay(day.date)}
                       </span>
                       <span className="dl-count">
-                        {day.loaded}/{day.capacity}
+                        {limited ? `${day.loaded}/${day.capacity}` : `${day.loaded} lượt`}
                       </span>
-                      <span className="dl-bar" aria-hidden>
-                        <i
-                          style={{
-                            width: `${pct}%`,
-                            background: day.closed ? "var(--stamp)" : "var(--accent)",
-                          }}
-                        />
-                      </span>
+                      {limited ? (
+                        <span className="dl-bar" aria-hidden>
+                          <i
+                            style={{
+                              width: `${pct}%`,
+                              background: day.closed ? "var(--stamp)" : "var(--accent)",
+                            }}
+                          />
+                        </span>
+                      ) : null}
                       {day.closed ? (
                         <span className="tiny muted">Tạm dừng</span>
                       ) : null}

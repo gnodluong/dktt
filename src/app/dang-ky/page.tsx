@@ -21,11 +21,14 @@ export default async function RegisterPage({
     getSettings(),
   ]);
 
-  const picks = days.slice(0, 6).map((d) => ({
-    date: d.date,
-    disabled: d.closed || d.loaded >= d.capacity,
-    note: d.closed ? "Tạm dừng" : d.loaded >= d.capacity ? "Đã đủ lượt" : "Mở đăng ký",
-  }));
+  const picks = days.slice(0, 6).map((d) => {
+    const full = d.capacity > 0 && d.loaded >= d.capacity;
+    return {
+      date: d.date,
+      disabled: d.closed || full,
+      note: d.closed ? "Tạm dừng" : full ? "Đã đủ lượt" : "Mở đăng ký",
+    };
+  });
 
   return (
     <>

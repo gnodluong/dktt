@@ -40,12 +40,13 @@ export function CapacityForm({
             name="weekend"
             type="number"
             inputMode="numeric"
-            min={1}
+            min={0}
             max={2000}
             className="input"
             defaultValue={weekend}
             required
           />
+          <span className="hint">Để 0 = không giới hạn.</span>
         </div>
         <div className="field">
           <label htmlFor="capUrgent">Suất đột xuất mỗi ngày</label>
@@ -64,8 +65,8 @@ export function CapacityForm({
       </div>
 
       <p className="small muted">
-        Đặt cao hơn khi có ngày đông thân nhân (ví dụ 200). Hệ thống chặn đăng
-        ký khi đủ số này.
+        Đặt 0 để nhận không giới hạn lượt cuối tuần. Suất đột xuất vẫn giới hạn
+        riêng để đơn vị chủ động bố trí.
       </p>
 
       <button type="submit" className="btn btn-primary" disabled={pending}>

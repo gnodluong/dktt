@@ -162,13 +162,14 @@ export async function submitVisit(
   );
   if (blocked) return fail(`Ngày này đơn vị tạm dừng tiếp: ${blocked.title}.`);
 
-  const cap = kind === "urgent" ? settings.capacity.urgent : settings.capacity.weekend;
-  if ((countQ.count ?? 0) >= cap) {
-    return fail(
-      kind === "urgent"
-        ? "Đã hết suất đột xuất cho ngày này. Liên hệ trực ban đại đội."
-        : `Ngày ${monthDay(v.visitDate)} đã đủ ${cap} lượt đăng ký.`,
-    );
+  // Cuối tuần không giới hạn lượt; đơn đột xuất vẫn có suất riêng.
+  if (kind === "urgent") {
+    const cap = settings.capacity.urgent;
+    if ((countQ.count ?? 0) >= cap) {
+      return fail(
+        "Đã hết suất đột xuất cho ngày này. Liên hệ trực ban đại đội.",
+      );
+    }
   }
 
   if (dupQ.data) {

@@ -21,7 +21,7 @@ export interface UnitSettings {
 }
 
 const FALLBACK: UnitSettings = {
-  capacity: { weekend: 40, urgent: 6 },
+  capacity: { weekend: 0, urgent: 6 },
   cutoffHour: 20,
   unit: {
     don_vi: "Đại đội 5",

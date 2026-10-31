@@ -215,8 +215,8 @@ export async function saveCapacity(
   await requireStaff();
   const weekend = Number(fd.get("weekend"));
   const urgent = Number(fd.get("urgent"));
-  if (!Number.isInteger(weekend) || weekend < 1 || weekend > 2000) {
-    return { error: "Số lượt mỗi ngày phải từ 1 đến 2000." };
+  if (!Number.isInteger(weekend) || weekend < 0 || weekend > 2000) {
+    return { error: "Số lượt mỗi ngày phải từ 0 đến 2000 (0 = không giới hạn)." };
   }
   if (!Number.isInteger(urgent) || urgent < 0 || urgent > 500) {
     return { error: "Suất đột xuất phải từ 0 đến 500." };
@@ -232,7 +232,13 @@ export async function saveCapacity(
   revalidatePath("/dang-ky");
   revalidatePath("/dang-ky/dot-xuat");
   revalidatePath("/");
-  return { ok: true, notice: `Đã đặt ${weekend} lượt/ngày và ${urgent} suất đột xuất/ngày.` };
+  return {
+    ok: true,
+    notice:
+      weekend > 0
+        ? `Đã đặt ${weekend} lượt/ngày và ${urgent} suất đột xuất/ngày.`
+        : `Không giới hạn lượt cuối tuần; ${urgent} suất đột xuất/ngày.`,
+  };
 }
 
 export async function saveVisitWindow(

@@ -37,7 +37,10 @@ export default async function SchedulePage() {
       ) : (
         <div className="rows">
           {days.map((d) => {
-            const pct = Math.min(100, Math.round((d.loaded / d.capacity) * 100));
+            const limited = d.capacity > 0;
+            const pct = limited
+              ? Math.min(100, Math.round((d.loaded / d.capacity) * 100))
+              : 0;
             const isToday = d.date === today;
             return (
               <div key={d.date} className="row">
@@ -53,29 +56,35 @@ export default async function SchedulePage() {
                         ? `Một phần: ${d.partialReason} (lớp ${d.partial.join(", ")})`
                         : "Đang mở đăng ký"}
                   </div>
-                  <div
-                    aria-hidden
-                    style={{
-                      marginTop: 8,
-                      height: 4,
-                      background: "var(--line)",
-                      borderRadius: 2,
-                      maxWidth: 260,
-                    }}
-                  >
+                  {limited ? (
                     <div
+                      aria-hidden
                       style={{
-                        height: "100%",
-                        width: `${pct}%`,
-                        background: d.closed ? "var(--stamp)" : "var(--accent)",
+                        marginTop: 8,
+                        height: 4,
+                        background: "var(--line)",
                         borderRadius: 2,
+                        maxWidth: 260,
                       }}
-                    />
-                  </div>
+                    >
+                      <div
+                        style={{
+                          height: "100%",
+                          width: `${pct}%`,
+                          background: d.closed ? "var(--stamp)" : "var(--accent)",
+                          borderRadius: 2,
+                        }}
+                      />
+                    </div>
+                  ) : null}
                 </div>
                 <div className="when small">
-                  {d.loaded}/{d.capacity} lượt
-                  <div className="tiny muted">{pct}% sức chứa</div>
+                  {limited
+                    ? `${d.loaded}/${d.capacity} lượt`
+                    : `${d.loaded} lượt đã đăng ký`}
+                  {limited ? (
+                    <div className="tiny muted">{pct}% sức chứa</div>
+                  ) : null}
                 </div>
                 <div>
                   <Link
