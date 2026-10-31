@@ -124,12 +124,6 @@ export function weekday(iso: string): number {
   return new Date(`${iso}T00:00:00Z`).getUTCDay();
 }
 
-export function diffDays(a: string, b: string): number {
-  return Math.round(
-    (Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000,
-  );
-}
-
 export function weekdayName(iso: string): string {
   return WD[weekday(iso)];
 }
@@ -170,15 +164,6 @@ export function weekendDays(weeks = 3, today = todayVN()): string[] {
   return out;
 }
 
-export function codeValid(code: string): boolean {
-  return /^DK\d{6}-[A-Z0-9]{4}$/.test(code.trim().toUpperCase());
-}
-
-export function maskPhone(phone: string): string {
-  const p = phone.replace(/\D/g, "");
-  return p.length >= 7 ? `${p.slice(0, 3)}•••${p.slice(-2)}` : "•••";
-}
-
 export function classLabel(id?: string | null): string {
   if (!id) return "";
   return id;
@@ -188,9 +173,4 @@ export function squadLabel(id?: string | null): string {
   if (!id) return "";
   const n = id.split("-").pop();
   return n ? `Tiểu đội ${n}` : "";
-}
-
-export function initials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  return (parts[0]?.[0] ?? "") + (parts.at(-1)?.[0] ?? "");
 }

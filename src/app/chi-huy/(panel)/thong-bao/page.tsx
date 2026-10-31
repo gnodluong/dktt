@@ -17,7 +17,7 @@ export default async function NoticesAdminPage({
   await requireStaff();
   const sp = await searchParams;
   const [sat, sun] = upcomingWeekend();
-  const [classes, notices] = await Promise.all([getClasses(), getNotices(20)]);
+  const [classes, notices] = await Promise.all([getClasses(), getNotices(20, false)]);
 
   return (
     <>

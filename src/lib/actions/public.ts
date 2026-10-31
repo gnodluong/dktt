@@ -120,13 +120,13 @@ export async function submitVisit(
   );
   if (blocked) return fail(`Ngày này đơn vị tạm dừng tiếp: ${blocked.title}.`);
 
-  // Sức chứa.
+  // Sức chứa: giữ chỗ cho cả phiếu đang chờ, tránh duyệt quá sức chứa.
   const { count } = await admin()
     .from("visit_requests")
     .select("id", { count: "exact", head: true })
     .eq("visit_date", v.visitDate)
     .eq("session", v.session)
-    .in("status", kind === "urgent" ? ["approved", "checked_in", "pending"] : ["approved", "checked_in"]);
+    .in("status", ["pending", "approved", "checked_in"]);
 
   const cap = kind === "urgent" ? settings.capacity.urgent : settings.capacity.weekend;
   if ((count ?? 0) >= cap) {

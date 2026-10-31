@@ -98,6 +98,15 @@ drop trigger if exists visit_requests_touch on public.visit_requests;
 create trigger visit_requests_touch before update on public.visit_requests
   for each row execute function public.touch_updated_at();
 
+-- Bàn trực cập nhật trực tiếp khi có phiếu mới/đổi trạng thái.
+do $$
+begin
+  alter publication supabase_realtime add table public.visit_requests;
+exception
+  when duplicate_object then null;
+  when undefined_object then null;
+end $$;
+
 create table if not exists public.notices (
   id          uuid primary key default gen_random_uuid(),
   title       text not null,

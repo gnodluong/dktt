@@ -157,13 +157,13 @@ async function loadByDay(from: string, to: string) {
   return map;
 }
 
-export async function getNotices(limit = 5): Promise<Notice[]> {
+export async function getNotices(limit = 5, activeOnly = true): Promise<Notice[]> {
   try {
-    const { data } = await admin()
+    let q = admin()
       .from("notices")
-      .select("id, title, body, kind, start_date, end_date, class_ids, active, created_at")
-      .order("created_at", { ascending: false })
-      .limit(limit);
+      .select("id, title, body, kind, start_date, end_date, class_ids, active, created_at");
+    if (activeOnly) q = q.eq("active", true);
+    const { data } = await q.order("created_at", { ascending: false }).limit(limit);
     return (data ?? []) as Notice[];
   } catch {
     return [];
@@ -258,31 +258,6 @@ export async function getDashboard() {
       today,
     };
   }
-}
-
-export async function checkDayStatus(date: string, classId: string | null) {
-  const settings = await getSettings();
-  if (!date) return { ok: false, message: "Chưa chọn ngày." } as const;
-  if (date < todayVN()) return { ok: false, message: "Ngày đã qua." } as const;
-  const notices = await closureNotices(date, date);
-  const hits = closureFor(date, notices).filter(
-    (n) => !n.class_ids?.length || (classId ? n.class_ids.includes(classId) : false),
-  );
-  if (hits.length) {
-    return { ok: false, message: hits[0].title, closed: true } as const;
-  }
-  const load = await loadByDay(date, date);
-  if ((load.get(date) ?? 0) >= settings.capacity.weekend * 2) {
-    return { ok: false, message: "Ngày này đã đủ lượt tiếp." } as const;
-  }
-  return { ok: true, cutoffHour: settings.cutoffHour } as const;
-}
-
-export async function nextDayWithSlots(days = 21) {
-  const from = todayVN();
-  const to = addDays(from, days);
-  const map = await loadByDay(from, to);
-  return map;
 }
 
 export interface UrgentDay {

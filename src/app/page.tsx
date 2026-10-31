@@ -8,7 +8,6 @@ import {
   todayVN,
   upcomingWeekend,
   weekdayName,
-  weekdayShort,
 } from "@/lib/domain";
 
 export const dynamic = "force-dynamic";
