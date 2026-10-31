@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, ArrowRight } from "lucide-react";
 import { SoldierPicker } from "@/components/SoldierPicker";
 import { submitVisit } from "@/lib/actions/public";
@@ -29,17 +29,7 @@ function endOptions(start: string, end: string) {
   return [...new Set(out)];
 }
 
-export function RegistrationForm({
-  kind,
-  soldiers,
-  classes,
-  days,
-  window: visitWindow,
-  defaultDate,
-  minDate,
-  maxDate,
-  minLeadDays = 2,
-}: {
+type Props = {
   kind: "weekend" | "urgent";
   soldiers: Soldier[];
   classes: { id: string; name: string }[];
@@ -49,11 +39,67 @@ export function RegistrationForm({
   minDate?: string;
   maxDate?: string;
   minLeadDays?: number;
-}) {
+};
+
+export function RegistrationForm(props: Props) {
+  const [resetKey, setResetKey] = useState(0);
+  return (
+    <FormBody
+      key={resetKey}
+      {...props}
+      onReset={() => setResetKey((k) => k + 1)}
+    />
+  );
+}
+
+function FormBody({
+  onReset,
+  ...props
+}: Props & { onReset: () => void }) {
+  const {
+    kind,
+    soldiers,
+    classes,
+    days,
+    window: visitWindow,
+    defaultDate,
+    minDate,
+    maxDate,
+    minLeadDays = 2,
+  } = props;
   const [state, action, pending] = useActionState<FormState | null, FormData>(
     submitVisit,
     null,
   );
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Gửi lỗi: đưa về đầu form và trả lại đúng dữ liệu người dùng đã nhập.
+  useEffect(() => {
+    if (!state?.error) return;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    const form = formRef.current;
+    const vals = state.values;
+    if (!form || !vals) return;
+
+    for (const [name, value] of Object.entries(vals)) {
+      const el = form.elements.namedItem(name);
+      if (el instanceof HTMLInputElement) {
+        if (el.type !== "radio" && el.type !== "hidden") el.value = value;
+      } else if (
+        el instanceof HTMLTextAreaElement ||
+        el instanceof HTMLSelectElement
+      ) {
+        el.value = value;
+      }
+    }
+
+    form
+      .querySelectorAll<HTMLInputElement>('input[name="visitDate"]')
+      .forEach((radio) => {
+        radio.checked = radio.value === vals.visitDate;
+      });
+  }, [state]);
 
   const [from, setFrom] = useState(visitWindow.start);
   const [to, setTo] = useState(endOptions(visitWindow.start, visitWindow.end)[0]);
@@ -81,7 +127,7 @@ export function RegistrationForm({
   }
 
   return (
-    <form action={action} className="form" noValidate>
+    <form ref={formRef} action={action} className="form" noValidate>
       <input type="hidden" name="kind" value={kind} />
       <input
         type="text"
@@ -355,14 +401,24 @@ export function RegistrationForm({
         Mang theo căn cước khi đến.
       </p>
 
-      <button
-        type="submit"
-        className="btn btn-primary btn-lg"
-        disabled={pending || (kind === "weekend" && openCount === 0)}
-      >
-        {pending ? "Đang gửi…" : "Gửi đăng ký"}
-        {pending ? null : <ArrowRight size={18} aria-hidden />}
-      </button>
+      <div className="form-actions">
+        <button
+          type="submit"
+          className="btn btn-primary btn-lg"
+          disabled={pending || (kind === "weekend" && openCount === 0)}
+        >
+          {pending ? "Đang gửi…" : "Gửi đăng ký"}
+          {pending ? null : <ArrowRight size={18} aria-hidden />}
+        </button>
+        <button
+          type="button"
+          className="btn btn-quiet"
+          onClick={onReset}
+          disabled={pending}
+        >
+          Làm lại
+        </button>
+      </div>
     </form>
   );
 }

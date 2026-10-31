@@ -44,8 +44,27 @@ const base = z.object({
   urgentReason: z.string().trim().max(400).optional(),
 });
 
-function fail(message: string): FormState {
-  return { error: message };
+const FIELD_NAMES = [
+  "soldierId",
+  "visitDate",
+  "timeFrom",
+  "timeTo",
+  "visitorName",
+  "relation",
+  "phone",
+  "idCard",
+  "address",
+  "companions",
+  "companionNames",
+  "purpose",
+  "note",
+  "urgentReason",
+] as const;
+
+function rawValues(fd: FormData): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const key of FIELD_NAMES) out[key] = String(fd.get(key) ?? "");
+  return out;
 }
 
 export async function submitVisit(
@@ -53,6 +72,11 @@ export async function submitVisit(
   fd: FormData,
 ): Promise<FormState> {
   const kind = fd.get("kind") === "urgent" ? "urgent" : "weekend";
+  // Trả lại đúng những gì người dùng đã gõ để họ sửa, không phải nhập lại.
+  const fail = (message: string): FormState => ({
+    error: message,
+    values: rawValues(fd),
+  });
 
   if (fd.get("website")) return { ok: true, code: "" };
 
@@ -78,7 +102,11 @@ export async function submitVisit(
     for (const issue of parsed.error.issues) {
       fields[String(issue.path[0])] ??= issue.message;
     }
-    return { error: "Vui lòng kiểm tra lại các ô được đánh dấu.", fields };
+    return {
+      error: "Vui lòng kiểm tra lại các ô được đánh dấu.",
+      fields,
+      values: rawValues(fd),
+    };
   }
 
   const v = parsed.data;

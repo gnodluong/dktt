@@ -381,6 +381,18 @@ button {
   gap: 8px;
 }
 
+.form-actions {
+  display: grid;
+  gap: 8px;
+}
+
+@media (min-width: 560px) {
+  .form-actions {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+}
+
 /* ------------------------------------------------------------------- board */
 .board {
   display: grid;
