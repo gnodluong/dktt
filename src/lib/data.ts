@@ -59,11 +59,38 @@ export async function getSoldiers(): Promise<Soldier[]> {
   }
 }
 
+export async function getAllSoldiers(): Promise<Soldier[]> {
+  try {
+    const { data } = await admin()
+      .from("soldiers")
+      .select("id, code, full_name, rank, position, class_id, squad_id, phone, active")
+      .order("class_id")
+      .order("squad_id")
+      .order("full_name");
+    return (data ?? []) as Soldier[];
+  } catch {
+    return [];
+  }
+}
+
+export async function getSoldier(id: string): Promise<Soldier | null> {
+  try {
+    const { data } = await admin()
+      .from("soldiers")
+      .select("id, code, full_name, rank, position, class_id, squad_id, phone, address, note, active")
+      .eq("id", id)
+      .maybeSingle();
+    return (data as Soldier) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getClasses() {
   try {
     const { data } = await admin()
       .from("classes")
-      .select("id, name, short_name, sort_order")
+      .select("id, name, short_name, sort_order, active")
       .order("sort_order");
     return data ?? [];
   } catch {

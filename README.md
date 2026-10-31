@@ -16,6 +16,8 @@ ngay trên điện thoại.
 | Duyệt / từ chối / ghi nhận đã tiếp | Chỉ huy, trực ban | Thân nhân nhận thông báo đẩy ngay |
 | Tạm dừng tiếp theo ngày | Chỉ huy | Khoá ngày đó, gửi thông báo cho toàn bộ hoặc từng lớp |
 | Tra cứu phiếu | Thân nhân | Xem lại phiếu bằng mã + 3 số cuối điện thoại |
+| Quản lý lớp, tiểu đội, quân nhân | Chỉ huy | Tạo lớp mới, thêm/sửa/ẩn quân nhân |
+| Nhập danh sách | Chỉ huy | Tải file Excel/Word, tự tạo lớp và tiểu đội |
 
 Quy tắc mặc định (sửa được trong bảng `settings`):
 
@@ -90,7 +92,35 @@ Bàn trực: `/chi-huy` (đăng nhập ở `/chi-huy/login`).
   thân nhân), có thông báo tạm dừng (tới toàn bộ thân nhân đã bật), và nhắc trước ngày
   đến thăm lúc 17:00.
 
-## 6. Cấu trúc
+## 6. Quản lý lớp và quân nhân
+
+**Lớp & tiểu đội** (`/chi-huy/lop`)
+
+- Tạo lớp mới bằng mã lớp (ví dụ `K4`) và tên lớp. Lớp mới hiện ngay trong form đăng ký
+  của thân nhân.
+- Thêm tiểu đội cho từng lớp; mã tiểu đội tự sinh (`K4-1`, `K4-2`…).
+- Tạm ẩn lớp không còn dùng — dữ liệu và phiếu cũ giữ nguyên.
+
+**Quân nhân** (`/chi-huy/quan-nhan`)
+
+- **Thêm quân nhân**: họ tên, lớp, tiểu đội, cấp bậc, chức vụ, điện thoại, địa chỉ.
+- **Sửa** từng dòng. Bỏ tick “Đang theo học” để ẩn khỏi form đăng ký mà vẫn giữ lịch sử phiếu.
+- **Nhập danh sách** (`/chi-huy/quan-nhan/nhap`): tải file mẫu, điền rồi tải lên.
+
+| Định dạng | Ghi chú |
+|---|---|
+| `.xlsx` | Đọc trang tính đầu tiên — giữ dấu tiếng Việt tốt nhất |
+| `.docx` | Đọc bảng đầu tiên trong file Word |
+| `.csv`, `.txt` | UTF-8, hoặc tự nhận bảng mã Windows-1258 |
+
+- Cột bắt buộc: **Họ và tên**, **Lớp**. Các cột khác (Cấp bậc, Chức vụ, Tiểu đội, Điện thoại,
+  Địa chỉ, Ghi chú) tuỳ chọn; tên cột có dấu hay không dấu đều đọc được.
+- Lớp hoặc tiểu đội chưa có sẽ **tự tạo**. Cùng họ tên + cùng lớp thì **cập nhật**, không
+  nhân bản.
+- File mẫu: nút trong trang nhập, hoặc trực tiếp `/api/mau-nhap?dinh-dang=xlsx` và
+  `/api/mau-nhap?dinh-dang=docx`.
+
+## 7. Cấu trúc
 
 ```
 src/app/            tuyến công khai + bàn trực (route group (panel))
@@ -102,7 +132,7 @@ public/sw.js        service worker nhận thông báo đẩy
 scripts/            sinh seed, sinh khoá VAPID, sinh icon, chụp ảnh kiểm tra
 ```
 
-## 7. Bảo mật và giới hạn đã biết
+## 8. Bảo mật và giới hạn đã biết
 
 - Thân nhân **không có tài khoản**: gửi phiếu qua server action, tra cứu bằng mã + 3 số cuối
   điện thoại. Mã phiếu sinh ngẫu nhiên 4 ký tự hex kèm ngày, không đoán được hàng loạt.

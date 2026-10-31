@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ClipboardList,
   LayoutDashboard,
+  Layers,
   Megaphone,
   Settings,
   Users,
@@ -17,6 +18,7 @@ const ITEMS = [
   { href: "/chi-huy/lich", label: "Lịch tiếp", icon: CalendarDays },
   { href: "/chi-huy/thong-bao", label: "Thông báo", icon: Megaphone },
   { href: "/chi-huy/quan-nhan", label: "Quân nhân", icon: Users },
+  { href: "/chi-huy/lop", label: "Lớp & tiểu đội", icon: Layers },
   { href: "/chi-huy/cai-dat", label: "Cài đặt", icon: Settings },
 ];
 

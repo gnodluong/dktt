@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Search } from "lucide-react";
 import { classLabel, squadLabel, type Soldier } from "@/lib/domain";
 
@@ -10,7 +11,13 @@ const plain = (s: string) =>
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
 
-export function SoldierDirectory({ soldiers }: { soldiers: Soldier[] }) {
+export function SoldierDirectory({
+  soldiers,
+  editable = false,
+}: {
+  soldiers: Soldier[];
+  editable?: boolean;
+}) {
   const [q, setQ] = useState("");
 
   const groups = useMemo(() => {
@@ -82,14 +89,31 @@ export function SoldierDirectory({ soldiers }: { soldiers: Soldier[] }) {
                   <div className="who">
                     {s.rank ? `${s.rank} · ` : ""}
                     {s.full_name}
+                    {s.active === false ? (
+                      <span className="pill" style={{ marginLeft: 8 }}>
+                        Đã ẩn
+                      </span>
+                    ) : null}
                   </div>
                   <div className="meta">
                     {s.position ?? ""}
                     {s.squad_id ? ` · ${squadLabel(s.squad_id)}` : ""}
                   </div>
                 </div>
-                <div className="when small muted">{s.code}</div>
-                <div className="small muted">{s.phone ?? ""}</div>
+                <div className="when small muted">
+                  {s.code}
+                  {s.phone ? <div className="tiny">{s.phone}</div> : null}
+                </div>
+                <div>
+                  {editable ? (
+                    <Link
+                      href={`/chi-huy/quan-nhan/${s.id}`}
+                      className="btn btn-quiet btn-sm"
+                    >
+                      Sửa
+                    </Link>
+                  ) : null}
+                </div>
               </div>
             ))}
           </div>

@@ -14,6 +14,8 @@ export interface Soldier {
   squad_id: string | null;
   phone?: string | null;
   address?: string | null;
+  note?: string | null;
+  active?: boolean;
 }
 
 export interface VisitRequest {
