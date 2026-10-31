@@ -44,7 +44,7 @@ export function SoldierPicker({
   return (
     <div className="field" data-invalid={Boolean(error)}>
       <label htmlFor="soldier-search">
-        Quân nhân được thăm <span className="req">*</span>
+        Họ tên quân nhân <span className="req">*</span>
       </label>
 
       <input type="hidden" name="soldierId" value={selected?.id ?? ""} />
@@ -105,14 +105,16 @@ export function SoldierPicker({
                 }
                 if (e.key === "Escape") setOpen(false);
               }}
-              role="combobox"
-              aria-expanded={open}
-              aria-controls="soldier-list"
             />
           </div>
 
           {open ? (
-            <div className="picker-panel" id="soldier-list" role="listbox">
+            <div
+              className="picker-panel"
+              id="soldier-list"
+              role="group"
+              aria-label="Kết quả tìm quân nhân"
+            >
               {results.length === 0 ? (
                 <div className="picker-empty">
                   Không tìm thấy. Thử gõ không dấu hoặc kiểm tra lại họ tên.
@@ -123,8 +125,6 @@ export function SoldierPicker({
                     type="button"
                     key={s.id}
                     className="picker-row"
-                    role="option"
-                    aria-selected={false}
                     onClick={() => choose(s)}
                   >
                     <span className="who">{s.full_name}</span>

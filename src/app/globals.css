@@ -1507,7 +1507,7 @@ a.board-day:hover {
 .lead {
   font-size: 1rem;
   color: var(--ink-2);
-  max-width: 46ch;
+  max-width: 52ch;
 }
 
 .divider {
