@@ -102,7 +102,7 @@ Bàn trực: `/chi-huy` (đăng nhập ở `/chi-huy/login`).
 - Chỉ huy bật ở **Cài đặt → Thông báo đẩy trên thiết bị này**, bấm *Gửi thông báo thử* để kiểm tra.
 - Thân nhân bật ngay trên trang phiếu sau khi gửi; thiết bị được gắn với mã phiếu nên chỉ
   nhận thông báo của phiếu mình.
-- **iPhone/iPad**: phải *Chia sẻ → Thêm vào Màn hình chính* rồi mở app từ biểu tượng mới
+- **iPhone/iPad**: phải *Chia sẻ → Thêm vào Màn hình chính* (Safari hoặc Chrome) rồi mở app từ biểu tượng mới
   bật được (giới hạn của iOS 16.4+). App đã hiện hướng dẫn này.
 - Thông báo được gửi khi: có phiếu mới (tới chỉ huy), phiếu được duyệt/từ chối/huỷ (tới
   thân nhân), có thông báo tạm dừng (tới toàn bộ thân nhân đã bật), và nhắc trước ngày

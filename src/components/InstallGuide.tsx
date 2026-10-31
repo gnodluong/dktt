@@ -116,9 +116,10 @@ export function InstallGuide() {
         </div>
 
         <p className="small">
-          Trình duyệt trên điện thoại <b>không nhận được thông báo đẩy</b>. Thêm
-          ứng dụng vào Màn hình chính rồi mở từ biểu tượng đó — khi đó mới bật
-          được thông báo và biết ngay khi đại đội duyệt.
+          Trên điện thoại, thông báo chỉ hoạt động ổn định khi ứng dụng được thêm
+          vào <b>Màn hình chính</b> — <b>bắt buộc với iPhone</b>. Thêm bằng{" "}
+          <b>Safari</b> hoặc <b>Chrome</b>, rồi mở app từ biểu tượng đó và bật
+          thông báo.
         </p>
 
         {inApp ? (
@@ -137,22 +138,24 @@ export function InstallGuide() {
               <li>
                 <span className="n">1</span>
                 <span>
-                  Bấm nút <Share size={15} aria-hidden /> <b>Chia sẻ</b> ở thanh
-                  dưới Safari.
+                  Mở bằng <b>Safari</b> hoặc <b>Chrome</b> trên iPhone.
                 </span>
               </li>
               <li>
                 <span className="n">2</span>
                 <span>
-                  Chọn <Plus size={15} aria-hidden />{" "}
-                  <b>Thêm vào Màn hình chính</b>.
+                  <b>Safari</b>: bấm <Share size={15} aria-hidden />{" "}
+                  <b>Chia sẻ</b> ở thanh dưới. <b>Chrome</b>: bấm{" "}
+                  <MoreVertical size={15} aria-hidden /> <b>⋮</b> →{" "}
+                  <b>Chia sẻ</b>.
                 </span>
               </li>
               <li>
                 <span className="n">3</span>
                 <span>
-                  Mở app từ biểu tượng vừa thêm, vào <b>Cài đặt</b> và bật thông
-                  báo.
+                  Chọn <Plus size={15} aria-hidden />{" "}
+                  <b>Thêm vào Màn hình chính</b> (Add to Home Screen), rồi mở app
+                  từ biểu tượng và bật thông báo.
                 </span>
               </li>
             </>
@@ -161,14 +164,14 @@ export function InstallGuide() {
               <li>
                 <span className="n">1</span>
                 <span>
-                  Bấm menu <MoreVertical size={15} aria-hidden /> <b>⋮</b> ở góc
-                  trên Chrome.
+                  Mở bằng <b>Chrome</b> (hoặc trình duyệt khác) trên Android.
                 </span>
               </li>
               <li>
                 <span className="n">2</span>
                 <span>
-                  Chọn <b>Cài đặt ứng dụng</b> hoặc{" "}
+                  Bấm menu <MoreVertical size={15} aria-hidden /> <b>⋮</b> ở góc
+                  trên → <b>Cài đặt ứng dụng</b> hoặc{" "}
                   <b>Thêm vào Màn hình chính</b>.
                 </span>
               </li>
