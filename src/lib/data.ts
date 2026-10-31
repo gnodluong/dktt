@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { admin } from "@/lib/supabase/admin";
 import {
   type DayInfo,
@@ -36,8 +37,9 @@ const FALLBACK: UnitSettings = {
   },
 };
 
-export async function getSettings(): Promise<UnitSettings> {
-  try {
+// Cấu hình đơn vị đổi rất ít: cache 60 giây, xoá bằng revalidateTag("settings").
+const settingsCached = unstable_cache(
+  async (): Promise<UnitSettings> => {
     const { data } = await admin().from("settings").select("key, value");
     const map = new Map((data ?? []).map((r) => [r.key as string, r.value]));
     return {
@@ -50,6 +52,14 @@ export async function getSettings(): Promise<UnitSettings> {
       },
       contact: { ...FALLBACK.contact, ...(map.get("contact") as object) },
     };
+  },
+  ["settings"],
+  { revalidate: 60, tags: ["settings"] },
+);
+
+export async function getSettings(): Promise<UnitSettings> {
+  try {
+    return await settingsCached();
   } catch {
     return FALLBACK;
   }
@@ -69,8 +79,9 @@ export async function getStaffTitle(email: string): Promise<string> {
   }
 }
 
-export async function getSoldiers(): Promise<Soldier[]> {
-  try {
+// Danh sách quân nhân/lớp ít đổi: cache 60 giây, xoá bằng revalidateTag("roster").
+const soldiersCached = unstable_cache(
+  async (): Promise<Soldier[]> => {
     const { data } = await admin()
       .from("soldiers")
       .select("id, code, full_name, rank, position, class_id, squad_id")
@@ -79,13 +90,21 @@ export async function getSoldiers(): Promise<Soldier[]> {
       .order("squad_id")
       .order("full_name");
     return (data ?? []) as Soldier[];
+  },
+  ["soldiers-active"],
+  { revalidate: 60, tags: ["roster"] },
+);
+
+export async function getSoldiers(): Promise<Soldier[]> {
+  try {
+    return await soldiersCached();
   } catch {
     return [];
   }
 }
 
-export async function getAllSoldiers(): Promise<Soldier[]> {
-  try {
+const allSoldiersCached = unstable_cache(
+  async (): Promise<Soldier[]> => {
     const { data } = await admin()
       .from("soldiers")
       .select("id, code, full_name, rank, position, class_id, squad_id, phone, active")
@@ -93,6 +112,14 @@ export async function getAllSoldiers(): Promise<Soldier[]> {
       .order("squad_id")
       .order("full_name");
     return (data ?? []) as Soldier[];
+  },
+  ["soldiers-all"],
+  { revalidate: 60, tags: ["roster"] },
+);
+
+export async function getAllSoldiers(): Promise<Soldier[]> {
+  try {
+    return await allSoldiersCached();
   } catch {
     return [];
   }
@@ -111,26 +138,42 @@ export async function getSoldier(id: string): Promise<Soldier | null> {
   }
 }
 
-export async function getClasses() {
-  try {
+const classesCached = unstable_cache(
+  async () => {
     const { data } = await admin()
       .from("classes")
       .select("id, name, short_name, sort_order, active")
       .order("sort_order");
     return data ?? [];
+  },
+  ["classes"],
+  { revalidate: 60, tags: ["roster"] },
+);
+
+export async function getClasses() {
+  try {
+    return await classesCached();
   } catch {
     return [];
   }
 }
 
-export async function getSquads() {
-  try {
+const squadsCached = unstable_cache(
+  async () => {
     const { data } = await admin()
       .from("squads")
       .select("id, class_id, name, sort_order")
       .order("class_id")
       .order("sort_order");
     return data ?? [];
+  },
+  ["squads"],
+  { revalidate: 60, tags: ["roster"] },
+);
+
+export async function getSquads() {
+  try {
+    return await squadsCached();
   } catch {
     return [];
   }
@@ -162,32 +205,45 @@ export interface ScopedDay extends DayInfo {
   partialReason: string | null;
 }
 
-export async function getDays(weeks = 3): Promise<ScopedDay[]> {
-  const today = todayVN();
-  const dates = weekendDays(weeks, today);
-  if (!dates.length) return [];
-  const [settings, notices, load] = await Promise.all([
-    getSettings(),
-    closureNotices(dates[0], dates.at(-1)!),
-    loadByDay(dates[0], dates.at(-1)!),
-  ]);
+// Lịch tiếp đổi theo lượt duyệt: cache ngắn 15 giây để chịu được lượng truy cập lớn.
+const daysCached = unstable_cache(
+  async (weeks: number): Promise<ScopedDay[]> => {
+    const today = todayVN();
+    const dates = weekendDays(weeks, today);
+    if (!dates.length) return [];
+    const [settings, notices, load] = await Promise.all([
+      getSettings(),
+      closureNotices(dates[0], dates.at(-1)!),
+      loadByDay(dates[0], dates.at(-1)!),
+    ]);
 
-  return dates.map((date) => {
-    const hits = closureFor(date, notices);
-    const whole = hits.filter((n) => !n.class_ids || n.class_ids.length === 0);
-    const scoped = hits.filter((n) => n.class_ids && n.class_ids.length > 0);
-    const count = (load.get(date) ?? 0);
-    const capacity = settings.capacity.weekend;
-    return {
-      date,
-      closed: whole.length > 0,
-      reason: whole[0]?.title ?? null,
-      partial: scoped.flatMap((n) => n.class_ids ?? []),
-      partialReason: scoped[0]?.title ?? null,
-      loaded: count,
-      capacity,
-    };
-  });
+    return dates.map((date) => {
+      const hits = closureFor(date, notices);
+      const whole = hits.filter((n) => !n.class_ids || n.class_ids.length === 0);
+      const scoped = hits.filter((n) => n.class_ids && n.class_ids.length > 0);
+      const count = (load.get(date) ?? 0);
+      const capacity = settings.capacity.weekend;
+      return {
+        date,
+        closed: whole.length > 0,
+        reason: whole[0]?.title ?? null,
+        partial: scoped.flatMap((n) => n.class_ids ?? []),
+        partialReason: scoped[0]?.title ?? null,
+        loaded: count,
+        capacity,
+      };
+    });
+  },
+  ["days"],
+  { revalidate: 15, tags: ["days"] },
+);
+
+export async function getDays(weeks = 3): Promise<ScopedDay[]> {
+  try {
+    return await daysCached(weeks);
+  } catch {
+    return [];
+  }
 }
 
 async function loadByDay(from: string, to: string) {
@@ -209,14 +265,22 @@ async function loadByDay(from: string, to: string) {
   return map;
 }
 
-export async function getNotices(limit = 5, activeOnly = true): Promise<Notice[]> {
-  try {
+const noticesCached = unstable_cache(
+  async (limit: number, activeOnly: boolean): Promise<Notice[]> => {
     let q = admin()
       .from("notices")
       .select("id, title, body, kind, start_date, end_date, class_ids, active, created_at");
     if (activeOnly) q = q.eq("active", true);
     const { data } = await q.order("created_at", { ascending: false }).limit(limit);
     return (data ?? []) as Notice[];
+  },
+  ["notices"],
+  { revalidate: 30, tags: ["notices"] },
+);
+
+export async function getNotices(limit = 5, activeOnly = true): Promise<Notice[]> {
+  try {
+    return await noticesCached(limit, activeOnly);
   } catch {
     return [];
   }
@@ -350,37 +414,49 @@ export interface UrgentDay {
   capacity: number;
 }
 
-export async function getUrgentDays(): Promise<UrgentDay[]> {
-  const today = todayVN();
-  const dates = [today, addDays(today, 1), addDays(today, 2)];
-  const settings = await getSettings();
-  const notices = await closureNotices(dates[0], dates.at(-1)!);
-  const counts = new Map<string, number>();
+const urgentDaysCached = unstable_cache(
+  async (): Promise<UrgentDay[]> => {
+    const today = todayVN();
+    const dates = [today, addDays(today, 1), addDays(today, 2)];
+    const settings = await getSettings();
+    const notices = await closureNotices(dates[0], dates.at(-1)!);
+    const counts = new Map<string, number>();
 
-  try {
-    const { data } = await admin()
-      .from("visit_requests")
-      .select("visit_date")
-      .eq("kind", "urgent")
-      .in("visit_date", dates)
-      .in("status", ["pending", "approved", "checked_in"]);
-    for (const row of data ?? []) {
-      const d = row.visit_date as string;
-      counts.set(d, (counts.get(d) ?? 0) + 1);
+    try {
+      const { data } = await admin()
+        .from("visit_requests")
+        .select("visit_date")
+        .eq("kind", "urgent")
+        .in("visit_date", dates)
+        .in("status", ["pending", "approved", "checked_in"]);
+      for (const row of data ?? []) {
+        const d = row.visit_date as string;
+        counts.set(d, (counts.get(d) ?? 0) + 1);
+      }
+    } catch {
+      /* chưa cấu hình */
     }
-  } catch {
-    /* chưa cấu hình */
-  }
 
-  return dates.map((date) => {
-    const hits = closureFor(date, notices);
-    const whole = hits.filter((n) => !n.class_ids?.length);
-    return {
-      date,
-      closed: whole.length > 0,
-      reason: whole[0]?.title ?? null,
-      count: counts.get(date) ?? 0,
-      capacity: settings.capacity.urgent,
-    };
-  });
+    return dates.map((date) => {
+      const hits = closureFor(date, notices);
+      const whole = hits.filter((n) => !n.class_ids?.length);
+      return {
+        date,
+        closed: whole.length > 0,
+        reason: whole[0]?.title ?? null,
+        count: counts.get(date) ?? 0,
+        capacity: settings.capacity.urgent,
+      };
+    });
+  },
+  ["urgent-days"],
+  { revalidate: 15, tags: ["days"] },
+);
+
+export async function getUrgentDays(): Promise<UrgentDay[]> {
+  try {
+    return await urgentDaysCached();
+  } catch {
+    return [];
+  }
 }

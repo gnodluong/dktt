@@ -4,6 +4,7 @@ import { signOut } from "@/lib/actions/staff";
 import { ProfileForm, TestPushButton } from "@/components/ProfileForm";
 import { PushToggle } from "@/components/PushToggle";
 import { VisitWindowForm } from "@/components/VisitWindowForm";
+import { CapacityForm } from "@/components/CapacityForm";
 import { configured, VAPID_PUBLIC } from "@/lib/env";
 import { getSettings } from "@/lib/data";
 
@@ -58,6 +59,16 @@ export default async function SettingsPage() {
 
         <section className="stack">
           <div className="sec-head">
+            <h2>Sức chứa</h2>
+          </div>
+          <CapacityForm
+            weekend={settings.capacity.weekend}
+            urgent={settings.capacity.urgent}
+          />
+        </section>
+
+        <section className="stack">
+          <div className="sec-head">
             <h2>Thông báo đẩy trên thiết bị này</h2>
           </div>
           <p className="small muted">
@@ -87,14 +98,11 @@ export default async function SettingsPage() {
               <div className="small muted">{settings.unit.truong}</div>
             </div>
             <div className="row">
-              <div className="who">Sức chứa</div>
+              <div className="who">Đóng sổ đăng ký</div>
               <div className="meta">
-                {settings.capacity.weekend} lượt/ngày · {settings.capacity.urgent}{" "}
-                suất đột xuất/ngày
+                {settings.cutoffHour}:00 hôm trước
               </div>
-              <div className="small muted">
-                Đóng sổ lúc {settings.cutoffHour}:00 hôm trước
-              </div>
+              <div className="small muted">Áp dụng cho ngày mai</div>
             </div>
             <div className="row">
               <div className="who">Địa điểm tiếp</div>

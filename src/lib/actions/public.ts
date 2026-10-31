@@ -112,23 +112,45 @@ export async function submitVisit(
     return fail("Giờ bắt đầu đã qua. Chọn giờ muộn hơn hoặc ngày khác.");
   }
 
-  const { data: soldier } = await admin()
-    .from("soldiers")
-    .select("id, full_name, rank, class_id, squad_id, active")
-    .eq("id", v.soldierId)
-    .maybeSingle();
+  // Một lượt gọi song song thay vì 5 lượt tuần tự — giảm độ trễ khi đông người.
+  const [soldierQ, closuresQ, countQ, dupQ, recentQ] = await Promise.all([
+    admin()
+      .from("soldiers")
+      .select("id, full_name, rank, class_id, squad_id, active")
+      .eq("id", v.soldierId)
+      .maybeSingle(),
+    admin()
+      .from("notices")
+      .select("title, class_ids")
+      .eq("kind", "closure")
+      .eq("active", true)
+      .lte("start_date", v.visitDate)
+      .gte("end_date", v.visitDate),
+    admin()
+      .from("visit_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("visit_date", v.visitDate)
+      .in("status", ["pending", "approved", "checked_in"]),
+    admin()
+      .from("visit_requests")
+      .select("code")
+      .eq("phone", v.phone)
+      .eq("visit_date", v.visitDate)
+      .in("status", ["pending", "approved", "checked_in"])
+      .maybeSingle(),
+    admin()
+      .from("visit_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("phone", v.phone)
+      .gte("created_at", new Date(Date.now() - 86_400_000).toISOString()),
+  ]);
 
-  if (!soldier || !soldier.active) return fail("Không tìm thấy quân nhân trong danh sách.");
+  const soldier = soldierQ.data;
+  if (!soldier || !soldier.active) {
+    return fail("Không tìm thấy quân nhân trong danh sách.");
+  }
 
-  const { data: closures } = await admin()
-    .from("notices")
-    .select("title, class_ids")
-    .eq("kind", "closure")
-    .eq("active", true)
-    .lte("start_date", v.visitDate)
-    .gte("end_date", v.visitDate);
-
-  const blocked = (closures ?? []).find(
+  const blocked = (closuresQ.data ?? []).find(
     (n) =>
       !n.class_ids?.length ||
       (soldier.class_id && n.class_ids.includes(soldier.class_id)),
@@ -136,13 +158,7 @@ export async function submitVisit(
   if (blocked) return fail(`Ngày này đơn vị tạm dừng tiếp: ${blocked.title}.`);
 
   const cap = kind === "urgent" ? settings.capacity.urgent : settings.capacity.weekend;
-  const { count } = await admin()
-    .from("visit_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("visit_date", v.visitDate)
-    .in("status", ["pending", "approved", "checked_in"]);
-
-  if ((count ?? 0) >= cap) {
+  if ((countQ.count ?? 0) >= cap) {
     return fail(
       kind === "urgent"
         ? "Đã hết suất đột xuất cho ngày này. Liên hệ trực ban đại đội."
@@ -150,25 +166,15 @@ export async function submitVisit(
     );
   }
 
-  const { data: dup } = await admin()
-    .from("visit_requests")
-    .select("code")
-    .eq("phone", v.phone)
-    .eq("visit_date", v.visitDate)
-    .in("status", ["pending", "approved", "checked_in"])
-    .maybeSingle();
-  if (dup) {
+  if (dupQ.data) {
     return fail(
       `Số điện thoại này đã đăng ký cho ngày ${monthDay(v.visitDate)}.`,
     );
   }
 
-  const { count: recent } = await admin()
-    .from("visit_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("phone", v.phone)
-    .gte("created_at", new Date(Date.now() - 86_400_000).toISOString());
-  if ((recent ?? 0) >= 5) return fail("Số điện thoại này đã gửi quá nhiều đăng ký trong 24 giờ.");
+  if ((recentQ.count ?? 0) >= 5) {
+    return fail("Số điện thoại này đã gửi quá nhiều đăng ký trong 24 giờ.");
+  }
 
   const { data: created, error } = await admin()
     .from("visit_requests")

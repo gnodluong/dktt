@@ -1542,6 +1542,23 @@ a.board-day:hover {
   display: none;
 }
 
+.skeleton {
+  display: block;
+  border-radius: 4px;
+  background: var(--surface-2);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 @media print {
   .site-head,
   .site-foot,

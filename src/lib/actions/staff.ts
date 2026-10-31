@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireStaff } from "@/lib/auth";
 import { getSettings } from "@/lib/data";
@@ -107,6 +107,7 @@ export async function decide(_prev: FormState | null, fd: FormData): Promise<For
   }
 
   revalidatePath("/chi-huy");
+  revalidateTag("days", "max");
   revalidatePath("/chi-huy/don");
   revalidatePath("/");
   revalidatePath(`/dang-ky/ket-qua/${req.code}`);
@@ -167,6 +168,8 @@ export async function publishNotice(
     });
   }
 
+  revalidateTag("notices", "max");
+  revalidateTag("days", "max");
   revalidatePath("/");
   revalidatePath("/thong-bao");
   revalidatePath("/chi-huy/thong-bao");
@@ -180,6 +183,8 @@ export async function toggleNotice(fd: FormData) {
   const active = fd.get("active") === "true";
   if (!id) return;
   await admin().from("notices").update({ active }).eq("id", id);
+  revalidateTag("notices", "max");
+  revalidateTag("days", "max");
   revalidatePath("/");
   revalidatePath("/thong-bao");
   revalidatePath("/chi-huy/thong-bao");
@@ -203,6 +208,33 @@ export async function saveProfile(
   return { ok: true, notice: "Đã lưu." };
 }
 
+export async function saveCapacity(
+  _prev: FormState | null,
+  fd: FormData,
+): Promise<FormState> {
+  await requireStaff();
+  const weekend = Number(fd.get("weekend"));
+  const urgent = Number(fd.get("urgent"));
+  if (!Number.isInteger(weekend) || weekend < 1 || weekend > 2000) {
+    return { error: "Số lượt mỗi ngày phải từ 1 đến 2000." };
+  }
+  if (!Number.isInteger(urgent) || urgent < 0 || urgent > 500) {
+    return { error: "Suất đột xuất phải từ 0 đến 500." };
+  }
+  const { error } = await admin()
+    .from("settings")
+    .upsert({ key: "capacity", value: { weekend, urgent } });
+  if (error) return { error: "Chưa lưu được sức chứa." };
+  revalidateTag("settings", "max");
+  revalidateTag("days", "max");
+  revalidatePath("/chi-huy/cai-dat");
+  revalidatePath("/chi-huy/lich");
+  revalidatePath("/dang-ky");
+  revalidatePath("/dang-ky/dot-xuat");
+  revalidatePath("/");
+  return { ok: true, notice: `Đã đặt ${weekend} lượt/ngày và ${urgent} suất đột xuất/ngày.` };
+}
+
 export async function saveVisitWindow(
   _prev: FormState | null,
   fd: FormData,
@@ -220,6 +252,7 @@ export async function saveVisitWindow(
     .from("settings")
     .upsert({ key: "visit_window", value: { start, end } });
   if (error) return { error: "Chưa lưu được khung giờ." };
+  revalidateTag("settings", "max");
   revalidatePath("/chi-huy/cai-dat");
   revalidatePath("/chi-huy/lich");
   revalidatePath("/dang-ky");
