@@ -26,12 +26,12 @@ const FALLBACK: UnitSettings = {
     don_vi: "Đại đội 5",
     tieu_doan: "Tiểu đoàn 2",
     truong: "Trường Cao đẳng Hậu cần 2",
-    hotline: "096418047",
+    hotline: "0964180478",
   },
   visitWindow: { start: "08:30", end: "15:00" },
   contact: {
     name: "Lê Văn Mạnh",
-    phone: "096418047",
+    phone: "0964180478",
     address: "Số 50 Lê Văn Việt",
   },
 };

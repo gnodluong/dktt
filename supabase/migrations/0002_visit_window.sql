@@ -27,5 +27,5 @@ values ('visit_window', '{"start":"08:30","end":"15:00"}'::jsonb)
 on conflict (key) do nothing;
 
 insert into public.settings (key, value)
-values ('contact', '{"address":"Số 50 Lê Văn Việt","phone":"096418047","name":"Lê Văn Mạnh"}'::jsonb)
+values ('contact', '{"address":"Số 50 Lê Văn Việt","phone":"0964180478","name":"Lê Văn Mạnh"}'::jsonb)
 on conflict (key) do nothing;
