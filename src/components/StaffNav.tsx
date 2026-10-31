@@ -14,7 +14,7 @@ import {
 
 const ITEMS = [
   { href: "/chi-huy", label: "Tổng quan", icon: LayoutDashboard },
-  { href: "/chi-huy/don", label: "Phiếu", icon: ClipboardList },
+  { href: "/chi-huy/don", label: "Lịch sử", icon: ClipboardList },
   { href: "/chi-huy/lich", label: "Lịch tiếp", icon: CalendarDays },
   { href: "/chi-huy/thong-bao", label: "Thông báo", icon: Megaphone },
   { href: "/chi-huy/quan-nhan", label: "Quân nhân", icon: Users },
@@ -31,8 +31,13 @@ export function StaffNav({ pending = 0 }: { pending?: number }) {
     <>
       <aside className="side">
         <Link href="/chi-huy" className="brand">
-          <span className="brand-mark" aria-hidden>
-            Đ5
+          <span className="brand-mark">
+            <img
+              src="/logo.png"
+              alt="Logo Trường Cao đẳng Hậu cần 2"
+              width={38}
+              height={38}
+            />
           </span>
           <span>
             <span className="brand-name">Đại đội 5</span>

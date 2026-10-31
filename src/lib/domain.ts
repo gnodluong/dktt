@@ -29,7 +29,9 @@ export interface VisitRequest {
   class_id: string | null;
   squad_id: string | null;
   visit_date: string;
-  session: Session;
+  session?: Session | null;
+  time_from: string | null;
+  time_to: string | null;
   visitor_name: string;
   relation: string;
   phone: string;
@@ -74,9 +76,41 @@ export const STATUS_LABEL: Record<Status, string> = {
 };
 
 export const SESSIONS: Record<Session, { label: string; time: string }> = {
-  sang: { label: "Sáng", time: "08:00 – 10:30" },
-  chieu: { label: "Chiều", time: "14:00 – 16:30" },
+  sang: { label: "Sáng", time: "08:30 – 11:30" },
+  chieu: { label: "Chiều", time: "13:30 – 15:00" },
 };
+
+/** "08:30" → 510 */
+export function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+export function fromMinutes(total: number): string {
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+/** Các mốc 30 phút trong khung giờ, không gồm mốc kết thúc. */
+export function timeSlots(start: string, end: string): string[] {
+  const out: string[] = [];
+  const from = toMinutes(start);
+  const to = toMinutes(end);
+  for (let m = from; m < to; m += 30) out.push(fromMinutes(m));
+  return out;
+}
+
+export function timeText(r: {
+  time_from?: string | null;
+  time_to?: string | null;
+  session?: Session | null;
+}): string {
+  if (r.time_from && r.time_to) {
+    return `${r.time_from.slice(0, 5)} – ${r.time_to.slice(0, 5)}`;
+  }
+  return r.session ? SESSIONS[r.session].label : "—";
+}
 
 export const RELATIONS = [
   "Cha",
@@ -114,6 +148,16 @@ export function nowHourVN(): number {
       hour12: false,
     }).format(new Date()),
   );
+}
+
+/** Giờ hiện tại ở VN, dạng "09:41". */
+export function nowTimeVN(): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: TZ,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date());
 }
 
 export function addDays(iso: string, n: number): string {

@@ -21,16 +21,19 @@ export function LoginForm() {
       ) : null}
 
       <div className="field">
-        <label htmlFor="email">Email</label>
+        <label htmlFor="email">Tên đăng nhập</label>
         <input
           id="email"
           name="email"
-          type="email"
           className="input"
           autoComplete="username"
-          placeholder="chihuy@daidoi5.vn"
+          placeholder="Lê Văn Mạnh"
           required
         />
+        <span className="hint">
+          Gõ họ tên hoặc tên viết liền: Lê Văn Mạnh, Hồ Sỹ Long, Lương Trọng
+          Toàn.
+        </span>
       </div>
 
       <div className="field">

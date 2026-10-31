@@ -15,6 +15,8 @@ export interface UnitSettings {
   capacity: { weekend: number; urgent: number };
   cutoffHour: number;
   unit: { don_vi: string; tieu_doan: string; truong: string; hotline: string };
+  visitWindow: { start: string; end: string };
+  contact: { name: string; phone: string; address: string };
 }
 
 const FALLBACK: UnitSettings = {
@@ -24,7 +26,13 @@ const FALLBACK: UnitSettings = {
     don_vi: "Đại đội 5",
     tieu_doan: "Tiểu đoàn 2",
     truong: "Trường Cao đẳng Hậu cần 2",
-    hotline: "",
+    hotline: "096418047",
+  },
+  visitWindow: { start: "08:30", end: "15:00" },
+  contact: {
+    name: "Lê Văn Mạnh",
+    phone: "096418047",
+    address: "Số 50 Lê Văn Việt",
   },
 };
 
@@ -32,15 +40,32 @@ export async function getSettings(): Promise<UnitSettings> {
   try {
     const { data } = await admin().from("settings").select("key, value");
     const map = new Map((data ?? []).map((r) => [r.key as string, r.value]));
-    const capacity = { ...FALLBACK.capacity, ...(map.get("capacity") as object) };
-    const unit = { ...FALLBACK.unit, ...(map.get("unit") as object) };
     return {
-      capacity,
+      capacity: { ...FALLBACK.capacity, ...(map.get("capacity") as object) },
       cutoffHour: Number(map.get("cutoff_hour") ?? FALLBACK.cutoffHour),
-      unit,
+      unit: { ...FALLBACK.unit, ...(map.get("unit") as object) },
+      visitWindow: {
+        ...FALLBACK.visitWindow,
+        ...(map.get("visit_window") as object),
+      },
+      contact: { ...FALLBACK.contact, ...(map.get("contact") as object) },
     };
   } catch {
     return FALLBACK;
+  }
+}
+
+export async function getStaffTitle(email: string): Promise<string> {
+  try {
+    const { data } = await admin()
+      .from("settings")
+      .select("value")
+      .eq("key", "staff_titles")
+      .maybeSingle();
+    const map = (data?.value ?? {}) as Record<string, string>;
+    return map[email] ?? "";
+  } catch {
+    return "";
   }
 }
 
@@ -152,7 +177,7 @@ export async function getDays(weeks = 3): Promise<ScopedDay[]> {
     const whole = hits.filter((n) => !n.class_ids || n.class_ids.length === 0);
     const scoped = hits.filter((n) => n.class_ids && n.class_ids.length > 0);
     const count = (load.get(date) ?? 0);
-    const capacity = settings.capacity.weekend * 2;
+    const capacity = settings.capacity.weekend;
     return {
       date,
       closed: whole.length > 0,
@@ -261,28 +286,58 @@ export async function getRequests(
 export async function getDashboard() {
   const today = todayVN();
   try {
-    const [pending, todayRows, nextWeekend] = await Promise.all([
+    const [pending, todayRows, recent, days, notices] = await Promise.all([
       getRequests({ status: "pending", limit: 100 }),
       getRequests({ date: today, limit: 200 }),
-      Promise.resolve(upcomingWeekend(today)),
+      getRequests({ limit: 8 }),
+      getDays(3),
+      getNotices(3),
     ]);
+
     const approvedToday = todayRows.filter((r) =>
       ["approved", "checked_in"].includes(r.status),
     ).length;
+    const checkedInToday = todayRows.filter((r) => r.status === "checked_in").length;
+    const upcoming = days
+      .filter((d) => d.date >= today)
+      .reduce((n, d) => n + d.loaded, 0);
+
+    let monthCount = 0;
+    try {
+      const { count } = await admin()
+        .from("visit_requests")
+        .select("id", { count: "exact", head: true })
+        .gte("visit_date", `${today.slice(0, 8)}01`)
+        .lte("visit_date", today);
+      monthCount = count ?? 0;
+    } catch {
+      /* bỏ qua */
+    }
+
     return {
+      today,
       pending,
       todayRows,
+      recent,
+      days,
+      notices,
       approvedToday,
-      nextWeekend,
-      today,
+      checkedInToday,
+      upcoming,
+      monthCount,
     };
   } catch {
     return {
-      pending: [],
-      todayRows: [],
-      approvedToday: 0,
-      nextWeekend: upcomingWeekend(today),
       today,
+      pending: [] as VisitRequest[],
+      todayRows: [] as VisitRequest[],
+      recent: [] as VisitRequest[],
+      days: [] as ScopedDay[],
+      notices: [] as Notice[],
+      approvedToday: 0,
+      checkedInToday: 0,
+      upcoming: 0,
+      monthCount: 0,
     };
   }
 }

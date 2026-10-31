@@ -3,6 +3,7 @@ import { requireStaff } from "@/lib/auth";
 import { signOut } from "@/lib/actions/staff";
 import { ProfileForm, TestPushButton } from "@/components/ProfileForm";
 import { PushToggle } from "@/components/PushToggle";
+import { VisitWindowForm } from "@/components/VisitWindowForm";
 import { configured, VAPID_PUBLIC } from "@/lib/env";
 import { getSettings } from "@/lib/data";
 
@@ -47,6 +48,16 @@ export default async function SettingsPage() {
 
         <section className="stack">
           <div className="sec-head">
+            <h2>Khung giờ thăm</h2>
+          </div>
+          <VisitWindowForm
+            start={settings.visitWindow.start}
+            end={settings.visitWindow.end}
+          />
+        </section>
+
+        <section className="stack">
+          <div className="sec-head">
             <h2>Thông báo đẩy trên thiết bị này</h2>
           </div>
           <p className="small muted">
@@ -78,11 +89,18 @@ export default async function SettingsPage() {
             <div className="row">
               <div className="who">Sức chứa</div>
               <div className="meta">
-                {settings.capacity.weekend} lượt/buổi · {settings.capacity.urgent}{" "}
+                {settings.capacity.weekend} lượt/ngày · {settings.capacity.urgent}{" "}
                 suất đột xuất/ngày
               </div>
               <div className="small muted">
                 Đóng sổ lúc {settings.cutoffHour}:00 hôm trước
+              </div>
+            </div>
+            <div className="row">
+              <div className="who">Địa điểm tiếp</div>
+              <div className="meta">{settings.contact.address}</div>
+              <div className="small muted">
+                {settings.contact.name} · {settings.contact.phone}
               </div>
             </div>
           </div>

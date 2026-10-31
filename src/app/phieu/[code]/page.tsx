@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { CheckCircle2, Clock } from "lucide-react";
+import { CheckCircle2, Clock, MapPin, Phone } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { Slip } from "@/components/Slip";
 import { PushToggle } from "@/components/PushToggle";
 import { PrintButton } from "@/components/PrintButton";
 import { getRequestByCode, getSettings } from "@/lib/data";
-import { STATUS_LABEL, monthDay, weekdayShort } from "@/lib/domain";
+import { STATUS_LABEL, monthDay, timeText, weekdayShort } from "@/lib/domain";
 
 export const dynamic = "force-dynamic";
 
@@ -27,10 +27,7 @@ export default async function SlipPage({
 }) {
   const { code } = await params;
   const { moi } = await searchParams;
-  const [req, settings] = await Promise.all([
-    getRequestByCode(code),
-    getSettings(),
-  ]);
+  const [req, settings] = await Promise.all([getRequestByCode(code), getSettings()]);
 
   if (!req) {
     return (
@@ -41,16 +38,16 @@ export default async function SlipPage({
             <div className="empty">
               <strong>Không tìm thấy phiếu</strong>
               <p>
-                Mã <b>{code}</b> không có trong sổ đăng ký. Kiểm tra lại mã trên
-                tin nhắn hoặc tra cứu bằng số điện thoại.
+                Mã <b>{code}</b> không có trong sổ đăng ký. Kiểm tra lại liên kết
+                hoặc liên hệ {settings.contact.name} ({settings.contact.phone}).
               </p>
-              <Link href="/tra-cuu" className="btn btn-ghost" style={{ marginTop: 8 }}>
-                Tra cứu phiếu
+              <Link href="/" className="btn btn-ghost" style={{ marginTop: 8 }}>
+                Về trang chủ
               </Link>
             </div>
           </div>
         </main>
-        <SiteFooter hotline={settings.unit.hotline} />
+        <SiteFooter contact={settings.contact} />
       </>
     );
   }
@@ -68,7 +65,7 @@ export default async function SlipPage({
               <CheckCircle2 size={17} aria-hidden />
               <span>
                 Đã gửi phiếu. Giữ mã <b>{req.code}</b> — bạn cần mã này khi đến
-                cổng và khi tra cứu.
+                cổng.
               </span>
             </div>
           ) : null}
@@ -79,14 +76,28 @@ export default async function SlipPage({
             </h1>
             <p className="lead">
               {approved
-                ? `${weekdayShort(req.visit_date)} ${monthDay(req.visit_date)} — mời bạn đến đúng khung giờ đã đăng ký.`
+                ? `${weekdayShort(req.visit_date)} ${monthDay(req.visit_date)} · ${timeText(
+                    req,
+                  )} — mời bạn đến đúng khung giờ đã đăng ký.`
                 : req.status === "pending"
                   ? "Phiếu đang chờ chỉ huy đại đội duyệt. Bạn sẽ nhận thông báo khi có kết quả."
-                  : "Phiếu không còn hiệu lực. Liên hệ trực ban đại đội nếu cần hỗ trợ."}
+                  : "Phiếu không còn hiệu lực. Liên hệ ban chỉ huy đại đội nếu cần hỗ trợ."}
             </p>
           </div>
 
-          <Slip req={req} fresh={fresh && approved} />
+          <Slip req={req} fresh={fresh && approved} contact={settings.contact} />
+
+          {approved ? (
+            <div className="facts">
+              <span>
+                <MapPin size={15} aria-hidden /> {settings.contact.address}
+              </span>
+              <span>
+                <Phone size={15} aria-hidden /> {settings.contact.name} ·{" "}
+                <a href={`tel:${settings.contact.phone}`}>{settings.contact.phone}</a>
+              </span>
+            </div>
+          ) : null}
 
           <div className="stack-sm no-print">
             <div className="sec-head" style={{ marginTop: 6 }}>
@@ -101,22 +112,23 @@ export default async function SlipPage({
 
           <div className="btn-row no-print">
             <PrintButton />
-            <Link href="/tra-cuu" className="btn btn-quiet">
-              Tra cứu phiếu khác
-            </Link>
             <Link href="/" className="btn btn-quiet">
               Trang chủ
             </Link>
           </div>
 
           <p className="tiny muted">
-            <Clock size={13} aria-hidden style={{ display: "inline", verticalAlign: "-2px" }} />{" "}
+            <Clock
+              size={13}
+              aria-hidden
+              style={{ display: "inline", verticalAlign: "-2px" }}
+            />{" "}
             Phiếu chỉ có giá trị khi trạng thái “Đã duyệt”. Mang theo căn cước
-            công dân khi đến cổng.
+            công dân khi đến.
           </p>
         </div>
       </main>
-      <SiteFooter hotline={settings.unit.hotline} />
+      <SiteFooter contact={settings.contact} />
     </>
   );
 }

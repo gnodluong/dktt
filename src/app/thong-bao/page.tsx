@@ -73,7 +73,7 @@ export default async function NoticesPage() {
           )}
         </div>
       </main>
-      <SiteFooter hotline={settings.unit.hotline} />
+      <SiteFooter contact={settings.contact} />
     </>
   );
 }

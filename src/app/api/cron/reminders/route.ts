@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { CRON_SECRET } from "@/lib/env";
 import { admin } from "@/lib/supabase/admin";
 import { notifyFamily, notifyStaff } from "@/lib/push";
-import { addDays, monthDay, todayVN, SESSIONS } from "@/lib/domain";
+import { addDays, monthDay, timeText, todayVN } from "@/lib/domain";
 import type { Session } from "@/lib/domain";
 
 export const dynamic = "force-dynamic";
@@ -19,14 +19,14 @@ export async function GET(request: Request) {
 
   const { data: rows } = await admin()
     .from("visit_requests")
-    .select("id, code, soldier_name, session, visitor_name")
+    .select("id, code, soldier_name, session, time_from, time_to, visitor_name")
     .eq("visit_date", tomorrow)
     .eq("status", "approved");
 
   for (const row of rows ?? []) {
     reminders += await notifyFamily(row.id as string, {
       title: "Ngày mai đến thăm",
-      body: `${row.soldier_name} · ${SESSIONS[row.session as Session].time}. Mang theo phiếu ${row.code}.`,
+      body: `${row.soldier_name} · ${timeText(row)}. Mang theo phiếu ${row.code}.`,
       url: `/phieu/${row.code}`,
       tag: `dktt-nhac-${row.code}`,
     });

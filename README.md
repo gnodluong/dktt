@@ -15,7 +15,7 @@ ngay trên điện thoại.
 | Đăng ký đột xuất | Thân nhân, trong 3 ngày tới | Đơn có lý do, cần chỉ huy duyệt, suất giới hạn |
 | Duyệt / từ chối / ghi nhận đã tiếp | Chỉ huy, trực ban | Thân nhân nhận thông báo đẩy ngay |
 | Tạm dừng tiếp theo ngày | Chỉ huy | Khoá ngày đó, gửi thông báo cho toàn bộ hoặc từng lớp |
-| Tra cứu phiếu | Thân nhân | Xem lại phiếu bằng mã + 3 số cuối điện thoại |
+| Lịch sử đăng ký | Chỉ huy | Sổ toàn bộ phiếu, lọc theo ngày và trạng thái, xuất CSV |
 | Quản lý lớp, tiểu đội, quân nhân | Chỉ huy | Tạo lớp mới, thêm/sửa/ẩn quân nhân |
 | Nhập danh sách | Chỉ huy | Tải file Excel/Word, tự tạo lớp và tiểu đội |
 
@@ -23,17 +23,20 @@ Quy tắc mặc định (sửa được trong bảng `settings`):
 
 - **Thứ Bảy và Chủ nhật mở tiếp hằng tuần.** Không cần bật gì.
 - Đăng ký ngày mai đóng lúc **20:00 hôm trước** (`cutoff_hour`).
-- **40 lượt/buổi** (`capacity.weekend`), **6 suất đột xuất/ngày** (`capacity.urgent`).
+- **40 lượt/ngày** (`capacity.weekend`), **6 suất đột xuất/ngày** (`capacity.urgent`).
 - Ngày bị thông báo tạm dừng thì không nhận phiếu, kể cả phiếu đã có sẵn.
+- **Khung giờ thăm 08:30 – 15:00** (`visit_window`), ban chỉ huy sửa trong *Cài đặt*.
+  Thân nhân chọn khoảng 30 phút trong khung đó khi đăng ký; không giới hạn số người đi cùng.
 
 ## 1. Cài đặt Supabase
 
 1. Tạo project (hoặc dùng project hiện có).
 2. Mở **SQL Editor**, chạy lần lượt:
    - [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) — bảng, chính sách truy cập, bucket `chung-tu`.
+   - [`supabase/migrations/0002_visit_window.sql`](supabase/migrations/0002_visit_window.sql) — cột giờ đến, bỏ giới hạn số người, khung giờ thăm.
    - [`supabase/seed.sql`](supabase/seed.sql) — 3 lớp, 16 tiểu đội, **191 quân nhân** lấy từ `roster.json` của đơn vị.
 
-   Hoặc dán một lần [`supabase/setup.sql`](supabase/setup.sql) (gộp cả hai file trên).
+   Hoặc dán một lần [`supabase/setup.sql`](supabase/setup.sql) (gộp cả ba file trên).
 3. **Authentication → Sign In / Providers**: tắt *Allow new users to sign up* để chỉ người được tạo mới đăng nhập được.
 4. Tạo tài khoản chỉ huy: **Authentication → Users → Add user** (email + mật khẩu). Trigger tự tạo hồ sơ với vai trò `duty`.
 5. Nâng quyền chỉ huy:
@@ -42,6 +45,10 @@ Quy tắc mặc định (sửa được trong bảng `settings`):
 update public.profiles set role = 'commander', full_name = 'Nguyễn Văn A'
 where id = (select id from auth.users where email = 'chihuy@daidoi5.vn');
 ```
+
+**Đăng nhập bằng họ tên.** Trang đăng nhập nhận họ tên ("Lê Văn Mạnh"), tên viết liền
+("levanmanh") hoặc email; hệ thống tự ghép `levanmanh@daidoi5.vn`. Vì vậy tài khoản phải
+được tạo với email đúng quy tắc đó.
 
 Vai trò: `admin` (toàn quyền) · `commander` (chỉ huy) · `duty` (trực ban). Cả ba đều
 duyệt phiếu và đăng thông báo.
@@ -70,7 +77,7 @@ npm run dev      # http://localhost:3000
 npm run build    # kiểm tra bản production
 ```
 
-Trang thân nhân: `/` · `/dang-ky` · `/dang-ky/dot-xuat` · `/tra-cuu` · `/thong-bao`
+Trang thân nhân: `/` · `/dang-ky` · `/dang-ky/dot-xuat` · `/thong-bao`
 Bàn trực: `/chi-huy` (đăng nhập ở `/chi-huy/login`).
 
 ## 4. Deploy Vercel

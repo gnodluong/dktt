@@ -2,16 +2,17 @@ import Link from "next/link";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { RegistrationForm } from "@/components/RegistrationForm";
-import { getSettings, getSoldiers, getUrgentDays } from "@/lib/data";
+import { getClasses, getSettings, getSoldiers, getUrgentDays } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Đăng ký đột xuất" };
 
 export default async function UrgentPage() {
-  const [days, soldiers, settings] = await Promise.all([
+  const [days, soldiers, classes, settings] = await Promise.all([
     getUrgentDays(),
     getSoldiers(),
+    getClasses(),
     getSettings(),
   ]);
 
@@ -31,8 +32,16 @@ export default async function UrgentPage() {
       <main className="page-tight">
         <div className="wrap stack">
           <div className="stack-sm">
-            <Link href="/" className="small muted" style={{ textDecoration: "none", fontWeight: 600 }}>
-              <ArrowLeft size={14} aria-hidden style={{ display: "inline", verticalAlign: "-2px" }} />{" "}
+            <Link
+              href="/"
+              className="small muted"
+              style={{ textDecoration: "none", fontWeight: 600 }}
+            >
+              <ArrowLeft
+                size={14}
+                aria-hidden
+                style={{ display: "inline", verticalAlign: "-2px" }}
+              />{" "}
               Trang chủ
             </Link>
             <h1>Đăng ký đột xuất</h1>
@@ -51,7 +60,13 @@ export default async function UrgentPage() {
             </span>
           </div>
 
-          <RegistrationForm kind="urgent" soldiers={soldiers} days={picks} />
+          <RegistrationForm
+            kind="urgent"
+            soldiers={soldiers}
+            classes={classes.map((c) => ({ id: c.id as string, name: c.name as string }))}
+            days={picks}
+            window={settings.visitWindow}
+          />
 
           <p className="small muted">
             Việc không gấp thì{" "}
@@ -62,7 +77,7 @@ export default async function UrgentPage() {
           </p>
         </div>
       </main>
-      <SiteFooter hotline={settings.unit.hotline} />
+      <SiteFooter contact={settings.contact} />
     </>
   );
 }

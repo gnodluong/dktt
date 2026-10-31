@@ -7,10 +7,10 @@ import { browser } from "@/lib/supabase/browser";
 import { decide } from "@/lib/actions/staff";
 import { StatusPill } from "@/components/StatusPill";
 import {
-  SESSIONS,
   classLabel,
   monthDay,
   squadLabel,
+  timeText,
   weekdayShort,
   type VisitRequest,
 } from "@/lib/domain";
@@ -105,7 +105,7 @@ export function Queue({
                   <b>
                     {weekdayShort(r.visit_date)} {monthDay(r.visit_date)}
                   </b>
-                  {SESSIONS[r.session].label} ·{" "}
+                  {timeText(r)} ·{" "}
                   {r.kind === "urgent" ? "Đột xuất" : "Cuối tuần"}
                 </div>
               </div>
@@ -164,7 +164,7 @@ export function Queue({
                     {r.visitor_name} · {r.relation}
                   </div>
                   <div className="meta">
-                    {r.soldier_name} · {SESSIONS[r.session].label} · {r.companions} người
+                    {r.soldier_name} · {timeText(r)} · {r.companions} người
                   </div>
                 </div>
                 <div className="when small">

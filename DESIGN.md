@@ -15,23 +15,24 @@ Chữ ký nhận diện: **phiếu hẹn có cuống xé** (đường kẻ đứ
 
 ## Màu
 
-Sáng (mặc định):
+Sáng (mặc định) — bộ màu đơn vị: `#E0E2DB`, `#D2D4C8`, `#B8BDB5`, `#889696`, `#5F7470`.
 
 | Vai trò | Mã | Dùng cho | Tương phản |
 |---|---|---|---|
-| Nền giấy | `#eff0e8` | nền trang | — |
-| Mặt giấy | `#f8f8f1` | ô nhập, phiếu, thẻ | — |
-| Mực | `#191c15` | chữ chính | 15.6:1 trên nền |
-| Mực phụ | `#3c4134` | nhãn, chữ đỡ | 8.8:1 |
-| Mực mờ | `#585d4c` | ghi chú, placeholder | 5.9:1 |
-| Đường kẻ | `#d2d4c4` / `#adb29d` | viền 1px, kẻ đôi | — |
-| Xanh quân phục | `#3e4c34` | nút chính, trạng thái mở | 8.3:1 trên nền; chữ trắng 9.5:1 |
-| Đỏ con dấu | `#a3382a` | từ chối, tạm dừng, con dấu | 5.4:1 |
-| Xanh đã duyệt | `#2f6845` | đã duyệt, đã tiếp | 5.0:1 |
-| Hổ phách | `#7d5215` | chờ duyệt | 5.0:1 |
+| Nền giấy | `#e0e2db` | nền trang | — |
+| Mặt giấy | `#eceee7` | ô nhập, phiếu, thẻ | — |
+| Mực | `#1b2422` | chữ chính | 14.9:1 trên nền |
+| Mực phụ | `#38433f` | nhãn, chữ đỡ | 8.4:1 |
+| Mực mờ | `#56605c` | ghi chú, placeholder | 5.0:1 |
+| Đường kẻ | `#c2c6bb` / `#889696` | viền 1px, kẻ đôi | — |
+| Xanh đơn vị | `#5f7470` | nút chính, nhấn | chữ trắng 4.9:1 |
+| Đỏ con dấu | `#9e4a3c` | từ chối, tạm dừng, con dấu | 5.0:1 |
+| Xanh đã duyệt | `#45664f` | đã duyệt, đã tiếp | 5.6:1 |
+| Hổ phách | `#75612f` | chờ duyệt | 5.2:1 |
 
-Tối: nền `#12140d`, mặt `#1c2016`, mực `#eef0e3`, xanh quân phục sáng `#a7bd93`, đỏ
-`#e5887b`. Mọi tỉ lệ tương phản đều ≥ 4.5:1 cho chữ thân bài.
+Tối: nền `#121715`, mặt `#1a211e`, mực `#e8ebe4`, nhấn `#a9bdb4`, đỏ `#dd9a8c`.
+Mọi tỉ lệ tương phản đều ≥ 4.5:1 cho chữ thân bài. Đỏ chỉ dùng cho tín hiệu trạng thái
+(từ chối, tạm dừng, con dấu), không dùng làm màu thương hiệu.
 
 Không dùng màu làm dấu hiệu duy nhất: mỗi trạng thái luôn kèm chữ ("Chờ duyệt", "Đã duyệt").
 

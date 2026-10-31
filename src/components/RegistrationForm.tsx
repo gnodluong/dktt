@@ -1,13 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { AlertCircle, ArrowRight } from "lucide-react";
 import { SoldierPicker } from "@/components/SoldierPicker";
 import { submitVisit } from "@/lib/actions/public";
 import {
   RELATIONS,
-  SESSIONS,
+  fromMinutes,
   monthDay,
+  timeSlots,
+  toMinutes,
   weekdayShort,
   type Soldier,
 } from "@/lib/domain";
@@ -19,21 +21,42 @@ export interface DayPick {
   note: string;
 }
 
+function endOptions(start: string, end: string) {
+  const out: string[] = [];
+  const last = toMinutes(end);
+  for (let m = toMinutes(start) + 30; m <= last; m += 30) out.push(fromMinutes(m));
+  if (!out.includes(end) && last > toMinutes(start)) out.push(end);
+  return [...new Set(out)];
+}
+
 export function RegistrationForm({
   kind,
   soldiers,
+  classes,
   days,
+  window: visitWindow,
   defaultDate,
 }: {
   kind: "weekend" | "urgent";
   soldiers: Soldier[];
+  classes: { id: string; name: string }[];
   days: DayPick[];
+  window: { start: string; end: string };
   defaultDate?: string;
 }) {
   const [state, action, pending] = useActionState<FormState | null, FormData>(
     submitVisit,
     null,
   );
+
+  const [from, setFrom] = useState(visitWindow.start);
+  const [to, setTo] = useState(endOptions(visitWindow.start, visitWindow.end)[0]);
+
+  const starts = useMemo(
+    () => timeSlots(visitWindow.start, visitWindow.end),
+    [visitWindow],
+  );
+  const ends = useMemo(() => endOptions(from, visitWindow.end), [from, visitWindow.end]);
 
   const fields = state?.fields ?? {};
   const invalid = (name: string) => (fields[name] ? "true" : undefined);
@@ -42,6 +65,14 @@ export function RegistrationForm({
 
   const first = defaultDate ?? days.find((d) => !d.disabled)?.date ?? "";
   const openCount = days.filter((d) => !d.disabled).length;
+
+  function changeFrom(v: string) {
+    setFrom(v);
+    if (toMinutes(to) <= toMinutes(v)) {
+      const next = fromMinutes(toMinutes(v) + 30);
+      setTo(endOptions(v, visitWindow.end).includes(next) ? next : visitWindow.end);
+    }
+  }
 
   return (
     <form action={action} className="form" noValidate>
@@ -67,13 +98,17 @@ export function RegistrationForm({
           <span className="n">01</span>
           <h2>Quân nhân được thăm</h2>
         </div>
-        <SoldierPicker soldiers={soldiers} error={fields.soldierId} />
+        <SoldierPicker
+          soldiers={soldiers}
+          classes={classes}
+          error={fields.soldierId}
+        />
       </fieldset>
 
       <fieldset className="group">
         <div className="group-head">
           <span className="n">02</span>
-          <h2>Thời gian đến</h2>
+          <h2>Ngày và giờ đến</h2>
         </div>
 
         {openCount === 0 ? (
@@ -81,7 +116,7 @@ export function RegistrationForm({
             <AlertCircle size={17} aria-hidden />
             <span>
               Hiện không có ngày nào mở tiếp thân nhân. Theo dõi mục Thông báo
-              hoặc liên hệ trực ban đại đội.
+              hoặc liên hệ ban chỉ huy đại đội.
             </span>
           </div>
         ) : (
@@ -111,30 +146,46 @@ export function RegistrationForm({
         )}
         {err("visitDate")}
 
-        <div className="field">
-          <span className="label" id="session-label">
-            Buổi đến <span className="req">*</span>
-          </span>
-          <div className="segment" role="radiogroup" aria-labelledby="session-label">
-            {(["sang", "chieu"] as const).map((s) => (
-              <label key={s} className="seg">
-                <input
-                  type="radio"
-                  name="session"
-                  value={s}
-                  defaultChecked={s === "sang"}
-                />
-                <span>
-                  {SESSIONS[s].label}
-                  <small>{SESSIONS[s].time}</small>
-                </span>
-              </label>
-            ))}
+        <div className="grid-2">
+          <div className="field" data-invalid={invalid("timeFrom")}>
+            <label htmlFor="timeFrom">Từ giờ</label>
+            <select
+              id="timeFrom"
+              name="timeFrom"
+              className="select"
+              value={from}
+              onChange={(e) => changeFrom(e.target.value)}
+            >
+              {starts.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+            {err("timeFrom")}
           </div>
-          <span className="hint">
-            Có mặt trong khung giờ đã chọn để trực ban đại đội đón tiếp.
-          </span>
+          <div className="field" data-invalid={invalid("timeTo")}>
+            <label htmlFor="timeTo">Đến giờ</label>
+            <select
+              id="timeTo"
+              name="timeTo"
+              className="select"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+            >
+              {ends.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+            {err("timeTo")}
+          </div>
         </div>
+        <span className="hint">
+          Khung giờ thăm của đơn vị: {visitWindow.start} – {visitWindow.end}. Chọn
+          khoảng thời gian bạn có mặt.
+        </span>
 
         {kind === "urgent" ? (
           <div className="field" data-invalid={invalid("urgentReason")}>
@@ -212,7 +263,6 @@ export function RegistrationForm({
               required
             />
             {err("phone")}
-            <span className="hint">Dùng để đối chiếu khi tra cứu phiếu.</span>
           </div>
         </div>
 
@@ -240,14 +290,12 @@ export function RegistrationForm({
               type="number"
               inputMode="numeric"
               min={1}
-              max={kind === "urgent" ? 4 : 8}
+              max={200}
               defaultValue={1}
               required
             />
             {err("companions")}
-            <span className="hint">
-              Tính cả bạn. Tối đa {kind === "urgent" ? 4 : 8} người.
-            </span>
+            <span className="hint">Tính cả bạn.</span>
           </div>
         </div>
 

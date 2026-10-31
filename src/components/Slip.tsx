@@ -1,11 +1,11 @@
 import { headers } from "next/headers";
 import QRCode from "qrcode";
 import {
-  SESSIONS,
   STATUS_LABEL,
   classLabel,
   longDate,
   squadLabel,
+  timeText,
   type VisitRequest,
 } from "@/lib/domain";
 
@@ -45,9 +45,11 @@ export function Stamp({
 export async function Slip({
   req,
   fresh = false,
+  contact,
 }: {
   req: VisitRequest;
   fresh?: boolean;
+  contact: { name: string; phone: string; address: string };
 }) {
   const h = await headers();
   const host = h.get("host") ?? "localhost:3000";
@@ -61,7 +63,7 @@ export async function Slip({
       margin: 0,
       width: 240,
       errorCorrectionLevel: "M",
-      color: { dark: "#191c15", light: "#ffffff" },
+      color: { dark: "#1b2422", light: "#ffffff" },
     });
   } catch {
     qr = "";
@@ -99,10 +101,8 @@ export async function Slip({
             <dd>{longDate(req.visit_date)}</dd>
           </div>
           <div className="slip-row">
-            <dt>Buổi</dt>
-            <dd>
-              {SESSIONS[req.session].label} · {SESSIONS[req.session].time}
-            </dd>
+            <dt>Giờ đến</dt>
+            <dd>{timeText(req)}</dd>
           </div>
           <div className="slip-row">
             <dt>Số người</dt>
@@ -125,6 +125,16 @@ export async function Slip({
             </div>
           ) : null}
         </dl>
+
+        <div className="slip-contact">
+          <span className="slip-title">Địa điểm</span>
+          <div className="small">
+            {contact.address}
+            <br />
+            Liên hệ: {contact.name} ·{" "}
+            <a href={`tel:${contact.phone}`}>{contact.phone}</a>
+          </div>
+        </div>
       </div>
 
       <div className="slip-stub">

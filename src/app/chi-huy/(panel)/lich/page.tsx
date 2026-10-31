@@ -24,7 +24,7 @@ export default async function SchedulePage() {
         </div>
         <div className="totals">
           <span>
-            <b>{settings.capacity.weekend}</b> lượt/buổi
+            <b>{settings.capacity.weekend}</b> lượt/ngày
           </span>
           <span>
             <b>{settings.capacity.urgent}</b> suất đột xuất/ngày

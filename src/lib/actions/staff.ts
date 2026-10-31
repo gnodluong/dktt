@@ -3,19 +3,32 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireStaff } from "@/lib/auth";
+import { getSettings } from "@/lib/data";
 import { notifyAllFamily, notifyFamily, notifyOwn } from "@/lib/push";
 import { admin } from "@/lib/supabase/admin";
 import { supa } from "@/lib/supabase/server";
-import { SESSIONS, monthDay, weekdayShort } from "@/lib/domain";
+import { monthDay, timeText, toMinutes, weekdayShort } from "@/lib/domain";
 import type { FormState } from "@/lib/form";
 
+const slug = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/gi, "d")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
 export async function signIn(_prev: FormState | null, fd: FormData): Promise<FormState> {
-  const email = String(fd.get("email") ?? "").trim();
+  const raw = String(fd.get("email") ?? "").trim();
   const password = String(fd.get("password") ?? "");
-  if (!email || !password) return { error: "Nhập email và mật khẩu." };
+  if (!raw || !password) return { error: "Nhập tên đăng nhập và mật khẩu." };
+
+  // Cho phép gõ họ tên ("Lê Văn Mạnh"), tên rút gọn ("levanmanh") hoặc email.
+  const email = raw.includes("@") ? raw : `${slug(raw)}@daidoi5.vn`;
+
   const sb = await supa();
   const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) return { error: "Email hoặc mật khẩu không đúng." };
+  if (error) return { error: "Tên đăng nhập hoặc mật khẩu không đúng." };
   redirect("/chi-huy");
 }
 
@@ -47,7 +60,9 @@ export async function decide(_prev: FormState | null, fd: FormData): Promise<For
 
   const { data: req } = await admin()
     .from("visit_requests")
-    .select("id, code, status, visitor_name, soldier_name, visit_date, session, phone")
+    .select(
+      "id, code, status, visitor_name, soldier_name, visit_date, time_from, time_to, session, phone",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -69,6 +84,8 @@ export async function decide(_prev: FormState | null, fd: FormData): Promise<For
   if (error) return { error: "Chưa lưu được quyết định. Thử lại." };
 
   if (next === "approved" || next === "rejected" || next === "cancelled") {
+    const settings = await getSettings();
+    const place = settings.contact;
     await notifyFamily(req.id, {
       title:
         next === "approved"
@@ -76,11 +93,14 @@ export async function decide(_prev: FormState | null, fd: FormData): Promise<For
           : next === "rejected"
             ? "Phiếu chưa được duyệt"
             : "Phiếu đã được huỷ",
-      body: `${req.soldier_name} · ${weekdayShort(req.visit_date)} ${monthDay(
-        req.visit_date,
-      )} · ${SESSIONS[req.session as keyof typeof SESSIONS].label}${
-        note ? ` — ${note}` : ""
-      }`,
+      body:
+        next === "approved"
+          ? `${req.soldier_name} · ${weekdayShort(req.visit_date)} ${monthDay(
+              req.visit_date,
+            )} · ${timeText(req)}. Đến ${place.address}, gặp ${place.name} (${place.phone}).`
+          : `${req.soldier_name} · ${weekdayShort(req.visit_date)} ${monthDay(
+              req.visit_date,
+            )} · ${timeText(req)}${note ? ` — ${note}` : ""}`,
       url: `/phieu/${req.code}`,
       tag: `dktt-${req.code}`,
     });
@@ -181,6 +201,31 @@ export async function saveProfile(
   if (error) return { error: "Chưa lưu được." };
   revalidatePath("/chi-huy/cai-dat");
   return { ok: true, notice: "Đã lưu." };
+}
+
+export async function saveVisitWindow(
+  _prev: FormState | null,
+  fd: FormData,
+): Promise<FormState> {
+  await requireStaff();
+  const start = String(fd.get("start") ?? "");
+  const end = String(fd.get("end") ?? "");
+  if (!/^\d{2}:\d{2}$/.test(start) || !/^\d{2}:\d{2}$/.test(end)) {
+    return { error: "Chọn giờ hợp lệ." };
+  }
+  if (toMinutes(end) - toMinutes(start) < 30) {
+    return { error: "Khung giờ phải dài ít nhất 30 phút." };
+  }
+  const { error } = await admin()
+    .from("settings")
+    .upsert({ key: "visit_window", value: { start, end } });
+  if (error) return { error: "Chưa lưu được khung giờ." };
+  revalidatePath("/chi-huy/cai-dat");
+  revalidatePath("/chi-huy/lich");
+  revalidatePath("/dang-ky");
+  revalidatePath("/dang-ky/dot-xuat");
+  revalidatePath("/");
+  return { ok: true, notice: `Khung giờ thăm: ${start} – ${end}.` };
 }
 
 export async function sendTestPush(): Promise<FormState> {

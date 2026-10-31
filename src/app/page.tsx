@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Megaphone } from "lucide-react";
+import { ArrowRight, Megaphone, MapPin, Phone } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { getDays, getNotices, getSettings } from "@/lib/data";
 import {
@@ -12,12 +12,9 @@ import {
 
 export const dynamic = "force-dynamic";
 
-function stateOf(day: {
-  closed: boolean;
-  loaded: number;
-  capacity: number;
-}): { state: "open" | "closed" | "full"; text: string; sub: string } {
-  if (day.closed) return { state: "closed", text: "Tạm dừng tiếp", sub: "Theo thông báo của đơn vị" };
+function stateOf(day: { closed: boolean; loaded: number; capacity: number }) {
+  if (day.closed)
+    return { state: "closed", text: "Tạm dừng tiếp", sub: "Theo thông báo của đơn vị" };
   if (day.loaded >= day.capacity)
     return { state: "full", text: "Đã đủ lượt", sub: `${day.loaded}/${day.capacity} lượt` };
   return {
@@ -44,7 +41,7 @@ export default async function Home() {
       partial: [] as string[],
       partialReason: null as string | null,
       loaded: 0,
-      capacity: settings.capacity.weekend * 2,
+      capacity: settings.capacity.weekend,
     };
 
   const board = [find(sat), find(sun)];
@@ -60,9 +57,9 @@ export default async function Home() {
             <div className="stack-sm">
               <h1>Tiếp thân nhân</h1>
               <p className="lead">
-                Đăng ký trước để trực ban đại đội chuẩn bị đón tiếp. Thứ Bảy và
-                Chủ nhật mở sổ hằng tuần; việc gấp thì gửi đơn đột xuất để chỉ
-                huy duyệt.
+                Đăng ký trước để ban chỉ huy đại đội chuẩn bị đón tiếp. Thứ Bảy
+                và Chủ nhật mở sổ hằng tuần; việc gấp thì gửi đơn đột xuất để
+                chỉ huy duyệt.
               </p>
               <p className="small muted">Hôm nay {longDate(today)}</p>
             </div>
@@ -70,7 +67,6 @@ export default async function Home() {
             <div className="board">
               {board.map((d) => {
                 const s = stateOf(d);
-                const href = `/dang-ky?ngay=${d.date}`;
                 const common = (
                   <>
                     <span className="wd">{weekdayName(d.date)}</span>
@@ -86,7 +82,7 @@ export default async function Home() {
                 ) : (
                   <Link
                     key={d.date}
-                    href={href}
+                    href={`/dang-ky?ngay=${d.date}`}
                     className="board-day"
                     data-state={s.state}
                     aria-label={`Đăng ký thăm ${weekdayName(d.date)} ${monthDay(d.date)}`}
@@ -99,7 +95,11 @@ export default async function Home() {
 
             {closure ? (
               <p className="weekend-note">
-                <Megaphone size={15} aria-hidden style={{ display: "inline", verticalAlign: "-2px", marginRight: 6 }} />
+                <Megaphone
+                  size={15}
+                  aria-hidden
+                  style={{ display: "inline", verticalAlign: "-2px", marginRight: 6 }}
+                />
                 {weekdayName(closure.date)} {monthDay(closure.date)} tạm dừng tiếp:{" "}
                 <b>{closure.reason}</b>.
               </p>
@@ -107,7 +107,11 @@ export default async function Home() {
 
             {partial ? (
               <p className="weekend-note">
-                <Megaphone size={15} aria-hidden style={{ display: "inline", verticalAlign: "-2px", marginRight: 6 }} />
+                <Megaphone
+                  size={15}
+                  aria-hidden
+                  style={{ display: "inline", verticalAlign: "-2px", marginRight: 6 }}
+                />
                 {partial.partialReason} — áp dụng cho lớp{" "}
                 <b>{partial.partial.join(", ")}</b>.
               </p>
@@ -118,18 +122,23 @@ export default async function Home() {
                 Đăng ký thăm thân
                 <ArrowRight size={18} aria-hidden />
               </Link>
-              <Link href="/tra-cuu" className="btn btn-ghost btn-lg">
-                Tra cứu phiếu
+              <Link href="/dang-ky/dot-xuat" className="btn btn-ghost btn-lg">
+                Đăng ký đột xuất
               </Link>
             </div>
 
-            <p className="small muted">
-              Có việc gấp trong ngày?{" "}
-              <Link href="/dang-ky/dot-xuat" style={{ fontWeight: 650 }}>
-                Gửi đơn đăng ký đột xuất
-              </Link>
-              . Đơn cần chỉ huy xác nhận trước khi vào cổng.
-            </p>
+            <div className="facts">
+              <span>
+                <MapPin size={15} aria-hidden /> {settings.contact.address}
+              </span>
+              <span>
+                <Phone size={15} aria-hidden /> {settings.contact.name} ·{" "}
+                <a href={`tel:${settings.contact.phone}`}>{settings.contact.phone}</a>
+              </span>
+              <span>
+                Giờ thăm: {settings.visitWindow.start} – {settings.visitWindow.end}
+              </span>
+            </div>
           </section>
 
           {notices.length > 0 ? (
@@ -142,7 +151,9 @@ export default async function Home() {
                 {notices.map((n) => (
                   <Link key={n.id} href={`/thong-bao/${n.id}`} className="notice-item">
                     <span className="meta">
-                      {n.kind === "closure" ? <span className="tag">Tạm dừng tiếp</span> : null}
+                      {n.kind === "closure" ? (
+                        <span className="tag">Tạm dừng tiếp</span>
+                      ) : null}
                       {n.start_date && n.end_date ? (
                         <span>
                           {monthDay(n.start_date)} – {monthDay(n.end_date)}
@@ -150,7 +161,10 @@ export default async function Home() {
                       ) : null}
                     </span>
                     <h3>{n.title}</h3>
-                    <p>{n.body.slice(0, 150)}{n.body.length > 150 ? "…" : ""}</p>
+                    <p>
+                      {n.body.slice(0, 150)}
+                      {n.body.length > 150 ? "…" : ""}
+                    </p>
                   </Link>
                 ))}
               </div>
@@ -187,7 +201,7 @@ export default async function Home() {
           </section>
         </div>
       </main>
-      <SiteFooter hotline={settings.unit.hotline} />
+      <SiteFooter contact={settings.contact} />
     </>
   );
 }

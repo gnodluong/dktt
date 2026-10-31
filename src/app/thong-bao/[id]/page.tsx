@@ -38,7 +38,7 @@ export default async function NoticePage({
             </div>
           </div>
         </main>
-        <SiteFooter hotline={settings.unit.hotline} />
+        <SiteFooter contact={settings.contact} />
       </>
     );
   }
@@ -104,7 +104,7 @@ export default async function NoticePage({
           </div>
         </div>
       </main>
-      <SiteFooter hotline={settings.unit.hotline} />
+      <SiteFooter contact={settings.contact} />
     </>
   );
 }

@@ -10,6 +10,7 @@ import {
   longDate,
   monthDay,
   squadLabel,
+  timeText,
   todayVN,
   weekdayShort,
   type Status,
@@ -17,7 +18,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Phiếu đăng ký" };
+export const metadata = { title: "Lịch sử đăng ký" };
 
 const TABS: { key: string; label: string }[] = [
   { key: "all", label: "Tất cả" },
@@ -65,7 +66,7 @@ export default async function RequestsPage({
       classLabel(r.class_id),
       squadLabel(r.squad_id),
       r.visit_date,
-      SESSIONS[r.session].label,
+      timeText(r),
       r.kind === "urgent" ? "Đột xuất" : "Cuối tuần",
       r.decision_note ?? "",
     ]),
@@ -75,7 +76,7 @@ export default async function RequestsPage({
     <>
       <div className="staff-head">
         <div>
-          <h1>Sổ phiếu</h1>
+          <h1>Lịch sử đăng ký</h1>
           <p className="small muted">
             {rows.length} phiếu{date ? ` · ${longDate(date)}` : ""}
           </p>
@@ -140,7 +141,7 @@ export default async function RequestsPage({
               </div>
               <div className="when small">
                 {weekdayShort(r.visit_date)} {monthDay(r.visit_date)} ·{" "}
-                {SESSIONS[r.session].label}
+                {timeText(r)}
                 <div className="tiny muted">
                   {r.kind === "urgent" ? "Đột xuất" : "Cuối tuần"} · {r.companions} người
                 </div>

@@ -1,6 +1,7 @@
 import { requireStaff } from "@/lib/auth";
 import { StaffNav } from "@/components/StaffNav";
 import { admin } from "@/lib/supabase/admin";
+import { getStaffTitle } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export default async function PanelLayout({
   children: React.ReactNode;
 }) {
   const profile = await requireStaff();
+  const title = await getStaffTitle(profile.email);
 
   let pending = 0;
   try {
@@ -28,7 +30,8 @@ export default async function PanelLayout({
       <div className="staff-main">
         {children}
         <p className="tiny muted" style={{ marginTop: 40 }}>
-          {profile.full_name} · {profile.role === "admin" ? "Quản trị" : profile.role === "commander" ? "Chỉ huy" : "Trực ban"}
+          {profile.full_name}
+          {title ? ` · ${title}` : ""}
         </p>
       </div>
     </div>

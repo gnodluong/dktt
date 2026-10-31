@@ -6,14 +6,15 @@ import { admin } from "@/lib/supabase/admin";
 import { getSettings } from "@/lib/data";
 import { notifyStaff } from "@/lib/push";
 import {
-  SESSIONS,
   addDays,
   isWeekend,
   monthDay,
   nowHourVN,
+  nowTimeVN,
+  timeText,
+  toMinutes,
   todayVN,
   weekdayShort,
-  type Session,
 } from "@/lib/domain";
 import type { FormState } from "@/lib/form";
 
@@ -22,17 +23,20 @@ const phone = z
   .trim()
   .regex(/^0\d{8,10}$/, "Số điện thoại không hợp lệ (VD: 0912345678)");
 
+const time = z.string().regex(/^\d{2}:\d{2}$/, "Chọn giờ");
+
 const base = z.object({
   soldierId: z.string().uuid("Chọn quân nhân được thăm"),
   visitDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Chọn ngày đến thăm"),
-  session: z.enum(["sang", "chieu"]),
+  timeFrom: time,
+  timeTo: time,
   visitorName: z.string().trim().min(2, "Nhập họ tên người đến thăm").max(60),
   relation: z.string().trim().min(1, "Chọn quan hệ với quân nhân").max(30),
   phone,
   idCard: z.string().trim().max(20).optional(),
   address: z.string().trim().max(160).optional(),
-  companions: z.coerce.number().int().min(1).max(8),
-  companionNames: z.string().trim().max(160).optional(),
+  companions: z.coerce.number().int().min(1, "Ít nhất 1 người").max(200),
+  companionNames: z.string().trim().max(300).optional(),
   purpose: z.string().trim().max(300).optional(),
   note: z.string().trim().max(300).optional(),
   urgentReason: z.string().trim().max(400).optional(),
@@ -48,13 +52,13 @@ export async function submitVisit(
 ): Promise<FormState> {
   const kind = fd.get("kind") === "urgent" ? "urgent" : "weekend";
 
-  // Bẫy bot: trường ẩn phải để trống.
   if (fd.get("website")) return { ok: true, code: "" };
 
   const parsed = base.safeParse({
     soldierId: fd.get("soldierId"),
     visitDate: fd.get("visitDate"),
-    session: fd.get("session"),
+    timeFrom: fd.get("timeFrom"),
+    timeTo: fd.get("timeTo"),
     visitorName: fd.get("visitorName"),
     relation: fd.get("relation"),
     phone: fd.get("phone"),
@@ -77,14 +81,17 @@ export async function submitVisit(
 
   const v = parsed.data;
   const today = todayVN();
+  const settings = await getSettings();
+  const window = settings.visitWindow;
 
   if (kind === "weekend") {
     if (!isWeekend(v.visitDate)) return fail("Ngày tiếp thân nhân là thứ Bảy hoặc Chủ nhật.");
     if (v.visitDate < today) return fail("Ngày đã qua.");
     if (v.visitDate > addDays(today, 28)) return fail("Chỉ mở đăng ký trong 4 tuần tới.");
-    // Sổ đăng ký ngày mai đóng lúc 20:00 hôm nay.
-    if (v.visitDate === addDays(today, 1) && nowHourVN() >= 20) {
-      return fail("Đã quá 20:00, không nhận đăng ký cho ngày mai.");
+    if (v.visitDate === addDays(today, 1) && nowHourVN() >= settings.cutoffHour) {
+      return fail(
+        `Đã quá ${settings.cutoffHour}:00, không nhận đăng ký cho ngày mai.`,
+      );
     }
   } else {
     if (v.visitDate < today) return fail("Ngày đã qua.");
@@ -94,7 +101,16 @@ export async function submitVisit(
     }
   }
 
-  const settings = await getSettings();
+  // Giờ đến phải nằm trong khung giờ thăm và đúng mốc 30 phút.
+  if (toMinutes(v.timeFrom) < toMinutes(window.start) || toMinutes(v.timeTo) > toMinutes(window.end)) {
+    return fail(`Giờ đến nằm trong khung ${window.start} – ${window.end}.`);
+  }
+  if (toMinutes(v.timeTo) <= toMinutes(v.timeFrom)) {
+    return fail("Giờ kết thúc phải sau giờ bắt đầu.");
+  }
+  if (v.visitDate === today && toMinutes(v.timeFrom) < toMinutes(nowTimeVN())) {
+    return fail("Giờ bắt đầu đã qua. Chọn giờ muộn hơn hoặc ngày khác.");
+  }
 
   const { data: soldier } = await admin()
     .from("soldiers")
@@ -104,7 +120,6 @@ export async function submitVisit(
 
   if (!soldier || !soldier.active) return fail("Không tìm thấy quân nhân trong danh sách.");
 
-  // Ngày bị tạm dừng tiếp (toàn đơn vị hoặc theo lớp).
   const { data: closures } = await admin()
     .from("notices")
     .select("title, class_ids")
@@ -120,24 +135,21 @@ export async function submitVisit(
   );
   if (blocked) return fail(`Ngày này đơn vị tạm dừng tiếp: ${blocked.title}.`);
 
-  // Sức chứa: giữ chỗ cho cả phiếu đang chờ, tránh duyệt quá sức chứa.
+  const cap = kind === "urgent" ? settings.capacity.urgent : settings.capacity.weekend;
   const { count } = await admin()
     .from("visit_requests")
     .select("id", { count: "exact", head: true })
     .eq("visit_date", v.visitDate)
-    .eq("session", v.session)
     .in("status", ["pending", "approved", "checked_in"]);
 
-  const cap = kind === "urgent" ? settings.capacity.urgent : settings.capacity.weekend;
   if ((count ?? 0) >= cap) {
     return fail(
       kind === "urgent"
         ? "Đã hết suất đột xuất cho ngày này. Liên hệ trực ban đại đội."
-        : `Buổi ${SESSIONS[v.session as Session].label.toLowerCase()} ngày ${monthDay(v.visitDate)} đã đủ ${cap} lượt.`,
+        : `Ngày ${monthDay(v.visitDate)} đã đủ ${cap} lượt đăng ký.`,
     );
   }
 
-  // Mỗi số điện thoại: 1 phiếu/ngày, tối đa 5 lượt gửi/ngày.
   const { data: dup } = await admin()
     .from("visit_requests")
     .select("code")
@@ -145,7 +157,11 @@ export async function submitVisit(
     .eq("visit_date", v.visitDate)
     .in("status", ["pending", "approved", "checked_in"])
     .maybeSingle();
-  if (dup) return fail(`Số điện thoại này đã có phiếu cho ngày ${monthDay(v.visitDate)} (${dup.code}).`);
+  if (dup) {
+    return fail(
+      `Số điện thoại này đã có phiếu cho ngày ${monthDay(v.visitDate)} (${dup.code}).`,
+    );
+  }
 
   const { count: recent } = await admin()
     .from("visit_requests")
@@ -164,7 +180,8 @@ export async function submitVisit(
       class_id: soldier.class_id,
       squad_id: soldier.squad_id,
       visit_date: v.visitDate,
-      session: v.session,
+      time_from: v.timeFrom,
+      time_to: v.timeTo,
       visitor_name: v.visitorName,
       relation: v.relation,
       phone: v.phone,
@@ -180,41 +197,21 @@ export async function submitVisit(
     .single();
 
   if (error || !created) {
-    return fail("Chưa gửi được phiếu. Vui lòng thử lại sau ít phút.");
+    return fail(
+      error?.message?.includes("column")
+        ? "Hệ thống chưa cập nhật lược đồ giờ thăm (migration 0002)."
+        : "Chưa gửi được phiếu. Vui lòng thử lại sau ít phút.",
+    );
   }
 
   await notifyStaff({
     title: kind === "urgent" ? "Đơn đột xuất mới" : "Phiếu đăng ký mới",
     body: `${v.visitorName} (${v.relation}) · ${soldier.full_name} · ${weekdayShort(
       v.visitDate,
-    )} ${monthDay(v.visitDate)} · ${SESSIONS[v.session as Session].label}`,
+    )} ${monthDay(v.visitDate)} · ${timeText({ time_from: v.timeFrom, time_to: v.timeTo })}`,
     url: "/chi-huy",
     tag: "dktt-don-moi",
   });
 
   redirect(`/phieu/${created.code}?moi=1`);
-}
-
-export async function lookupVisit(
-  _prev: FormState | null,
-  fd: FormData,
-): Promise<FormState> {
-  const code = String(fd.get("code") ?? "").trim().toUpperCase();
-  const tail = String(fd.get("phoneTail") ?? "").replace(/\D/g, "");
-
-  if (!code || tail.length < 3) {
-    return { error: "Nhập mã phiếu và 3 số cuối điện thoại đã dùng khi đăng ký." };
-  }
-
-  const { data } = await admin()
-    .from("visit_requests")
-    .select("code, phone")
-    .eq("code", code)
-    .maybeSingle();
-
-  if (!data) return { error: "Không thấy phiếu với mã này." };
-  if (!(data.phone as string).replace(/\D/g, "").endsWith(tail)) {
-    return { error: "Số điện thoại không khớp với phiếu." };
-  }
-  redirect(`/phieu/${data.code}?moi=1`);
 }
