@@ -26,9 +26,7 @@ export default async function PanelLayout({
     <div className="staff-shell">
       <StaffNav pending={pending} />
       <div className="staff-main">
-        <div className="wrap-wide" style={{ padding: 0, maxWidth: "none" }}>
-          {children}
-        </div>
+        {children}
         <p className="tiny muted" style={{ marginTop: 40 }}>
           {profile.full_name} · {profile.role === "admin" ? "Quản trị" : profile.role === "commander" ? "Chỉ huy" : "Trực ban"}
         </p>

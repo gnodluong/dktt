@@ -47,7 +47,9 @@ export default async function RegisterPage({
             kind="weekend"
             soldiers={soldiers}
             days={picks}
-            defaultDate={ngay}
+            defaultDate={
+              ngay && picks.some((d) => d.date === ngay && !d.disabled) ? ngay : undefined
+            }
           />
 
           <p className="small muted">

@@ -30,6 +30,8 @@ Quy tắc mặc định (sửa được trong bảng `settings`):
 2. Mở **SQL Editor**, chạy lần lượt:
    - [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) — bảng, chính sách truy cập, bucket `chung-tu`.
    - [`supabase/seed.sql`](supabase/seed.sql) — 3 lớp, 16 tiểu đội, **191 quân nhân** lấy từ `roster.json` của đơn vị.
+
+   Hoặc dán một lần [`supabase/setup.sql`](supabase/setup.sql) (gộp cả hai file trên).
 3. **Authentication → Sign In / Providers**: tắt *Allow new users to sign up* để chỉ người được tạo mới đăng nhập được.
 4. Tạo tài khoản chỉ huy: **Authentication → Users → Add user** (email + mật khẩu). Trigger tự tạo hồ sơ với vai trò `duty`.
 5. Nâng quyền chỉ huy:

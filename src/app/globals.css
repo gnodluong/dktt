@@ -1003,11 +1003,10 @@ a.board-day:hover {
 }
 
 .slip-top {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 14px;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  align-items: start;
 }
 
 .slip-title {
@@ -1021,10 +1020,11 @@ a.board-day:hover {
 .slip-serial {
   font-family: var(--font-cond), "Arial Narrow", sans-serif;
   font-variant-numeric: tabular-nums;
-  font-size: 1.5rem;
+  font-size: clamp(1.15rem, 4.4vw, 1.4rem);
   font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1.1;
+  white-space: nowrap;
 }
 
 .slip-who {
@@ -1055,6 +1055,15 @@ a.board-day:hover {
   font-size: 0.8125rem;
   font-weight: 600;
   padding-top: 2px;
+  text-wrap: balance;
+}
+
+.stub-code {
+  font-family: var(--font-cond), "Arial Narrow", sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--ink-2);
 }
 
 .slip-row dd {
@@ -1279,6 +1288,28 @@ a.board-day:hover {
   flex: 1 1 160px;
   min-height: 40px;
   font-size: 0.875rem;
+}
+
+@media (max-width: 560px) {
+  .queue-when {
+    flex: 1 1 100%;
+    text-align: left;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .queue-when b {
+    display: inline;
+  }
+
+  .queue-actions .queue-note {
+    flex: 1 1 100%;
+  }
+
+  .queue-actions .btn {
+    flex: 1 1 0;
+  }
 }
 
 /* ------------------------------------------------------------------- staff */

@@ -72,7 +72,7 @@ export async function Slip({
       <div className="slip-main">
         <div className="slip-top">
           <div>
-            <div className="slip-title">Phiếu đăng ký tiếp thân nhân</div>
+            <div className="slip-title">Phiếu tiếp thân nhân</div>
             <div className="slip-serial">{req.code}</div>
           </div>
           <Stamp status={req.status} land={fresh && req.status === "approved"} />
@@ -135,7 +135,7 @@ export async function Slip({
           dangerouslySetInnerHTML={{ __html: qr }}
         />
         <div className="stub-label">
-          {req.code}
+          <span className="stub-code">{req.code}</span>
           <br />
           {req.visit_date.slice(8, 10)}/{req.visit_date.slice(5, 7)}
         </div>

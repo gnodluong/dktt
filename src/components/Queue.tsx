@@ -30,7 +30,7 @@ export function Queue({
   useEffect(() => {
     const sb = browser();
     const channel = sb
-      .channel("dktt-bantruc")
+      .channel(`dktt-bantruc-${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "visit_requests" },
