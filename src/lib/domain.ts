@@ -170,6 +170,12 @@ export function weekday(iso: string): number {
   return new Date(`${iso}T00:00:00Z`).getUTCDay();
 }
 
+export function diffDays(a: string, b: string): number {
+  return Math.round(
+    (Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000,
+  );
+}
+
 export function weekdayName(iso: string): string {
   return WD[weekday(iso)];
 }

@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { RegistrationForm } from "@/components/RegistrationForm";
 import { getClasses, getDays, getSettings, getSoldiers } from "@/lib/data";
+import { diffDays, todayVN } from "@/lib/domain";
 
 export const dynamic = "force-dynamic";
 
@@ -21,12 +22,20 @@ export default async function RegisterPage({
     getSettings(),
   ]);
 
+  const today = todayVN();
   const picks = days.slice(0, 6).map((d) => {
     const full = d.capacity > 0 && d.loaded >= d.capacity;
+    const tooClose = diffDays(today, d.date) < settings.minLeadDays;
     return {
       date: d.date,
-      disabled: d.closed || full,
-      note: d.closed ? "Tạm dừng" : full ? "Đã đủ lượt" : "Mở đăng ký",
+      disabled: d.closed || full || tooClose,
+      note: d.closed
+        ? "Tạm dừng"
+        : tooClose
+          ? `Báo trước ${settings.minLeadDays} ngày`
+          : full
+            ? "Đã đủ lượt"
+            : "Mở đăng ký",
     };
   });
 
@@ -61,6 +70,7 @@ export default async function RegisterPage({
             classes={classes.map((c) => ({ id: c.id as string, name: c.name as string }))}
             days={picks}
             window={settings.visitWindow}
+            minLeadDays={settings.minLeadDays}
             defaultDate={
               ngay && picks.some((d) => d.date === ngay && !d.disabled) ? ngay : undefined
             }

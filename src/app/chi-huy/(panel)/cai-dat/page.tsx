@@ -59,11 +59,12 @@ export default async function SettingsPage() {
 
         <section className="stack">
           <div className="sec-head">
-            <h2>Sức chứa</h2>
+            <h2>Giới hạn &amp; báo trước</h2>
           </div>
           <CapacityForm
             weekend={settings.capacity.weekend}
             urgent={settings.capacity.urgent}
+            lead={settings.minLeadDays}
           />
         </section>
 
@@ -98,11 +99,9 @@ export default async function SettingsPage() {
               <div className="small muted">{settings.unit.truong}</div>
             </div>
             <div className="row">
-              <div className="who">Đóng sổ đăng ký</div>
-              <div className="meta">
-                {settings.cutoffHour}:00 hôm trước
-              </div>
-              <div className="small muted">Áp dụng cho ngày mai</div>
+              <div className="who">Báo trước khi đăng ký</div>
+              <div className="meta">{settings.minLeadDays} ngày</div>
+              <div className="small muted">Áp dụng cho thứ Bảy, Chủ nhật</div>
             </div>
             <div className="row">
               <div className="who">Địa điểm tiếp</div>

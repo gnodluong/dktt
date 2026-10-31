@@ -8,9 +8,11 @@ import type { FormState } from "@/lib/form";
 export function CapacityForm({
   weekend,
   urgent,
+  lead,
 }: {
   weekend: number;
   urgent: number;
+  lead: number;
 }) {
   const [state, action, pending] = useActionState<FormState | null, FormData>(
     saveCapacity,
@@ -64,6 +66,24 @@ export function CapacityForm({
         </div>
       </div>
 
+      <div className="field" style={{ maxWidth: 260 }}>
+        <label htmlFor="leadDays">Báo trước (ngày)</label>
+        <input
+          id="leadDays"
+          name="lead"
+          type="number"
+          inputMode="numeric"
+          min={0}
+          max={14}
+          className="input"
+          defaultValue={lead}
+          required
+        />
+        <span className="hint">
+          Đăng ký cuối tuần phải gửi trước ít nhất số ngày này (để chốt cơm).
+        </span>
+      </div>
+
       <p className="small muted">
         Đặt 0 để nhận không giới hạn lượt cuối tuần. Suất đột xuất vẫn giới hạn
         riêng để đơn vị chủ động bố trí.
@@ -71,7 +91,7 @@ export function CapacityForm({
 
       <button type="submit" className="btn btn-primary" disabled={pending}>
         <Users size={16} aria-hidden />
-        {pending ? "Đang lưu…" : "Lưu sức chứa"}
+        {pending ? "Đang lưu…" : "Lưu cấu hình"}
       </button>
     </form>
   );

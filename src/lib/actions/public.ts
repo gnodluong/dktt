@@ -9,9 +9,9 @@ import { notifyStaff } from "@/lib/push";
 import { RESULT_COOKIE, RESULT_COOKIE_OPTIONS } from "@/lib/session";
 import {
   addDays,
+  diffDays,
   isWeekend,
   monthDay,
-  nowHourVN,
   nowTimeVN,
   timeText,
   toMinutes,
@@ -90,9 +90,10 @@ export async function submitVisit(
     if (!isWeekend(v.visitDate)) return fail("Ngày tiếp thân nhân là thứ Bảy hoặc Chủ nhật.");
     if (v.visitDate < today) return fail("Ngày đã qua.");
     if (v.visitDate > addDays(today, 28)) return fail("Chỉ mở đăng ký trong 4 tuần tới.");
-    if (v.visitDate === addDays(today, 1) && nowHourVN() >= settings.cutoffHour) {
+    // Đơn vị cần chốt cơm và chuẩn bị trước, nên phải báo trước vài ngày.
+    if (diffDays(today, v.visitDate) < settings.minLeadDays) {
       return fail(
-        `Đã quá ${settings.cutoffHour}:00, không nhận đăng ký cho ngày mai.`,
+        `Cần đăng ký trước ${settings.minLeadDays} ngày để đơn vị chuẩn bị.`,
       );
     }
   } else {

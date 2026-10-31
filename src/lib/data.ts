@@ -15,6 +15,7 @@ import {
 export interface UnitSettings {
   capacity: { weekend: number; urgent: number };
   cutoffHour: number;
+  minLeadDays: number;
   unit: { don_vi: string; tieu_doan: string; truong: string; hotline: string };
   visitWindow: { start: string; end: string };
   contact: { name: string; phone: string; address: string };
@@ -23,6 +24,7 @@ export interface UnitSettings {
 const FALLBACK: UnitSettings = {
   capacity: { weekend: 0, urgent: 6 },
   cutoffHour: 20,
+  minLeadDays: 2,
   unit: {
     don_vi: "Đại đội 5",
     tieu_doan: "Tiểu đoàn 2",
@@ -45,6 +47,7 @@ const settingsCached = unstable_cache(
     return {
       capacity: { ...FALLBACK.capacity, ...(map.get("capacity") as object) },
       cutoffHour: Number(map.get("cutoff_hour") ?? FALLBACK.cutoffHour),
+      minLeadDays: Number(map.get("min_lead_days") ?? FALLBACK.minLeadDays),
       unit: { ...FALLBACK.unit, ...(map.get("unit") as object) },
       visitWindow: {
         ...FALLBACK.visitWindow,

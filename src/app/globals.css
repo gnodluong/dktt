@@ -450,6 +450,10 @@ a.board-day:hover {
   color: var(--warn);
 }
 
+.board-day[data-state="late"] .status {
+  color: var(--warn);
+}
+
 .board-day[data-state="closed"]::after {
   content: "";
   position: absolute;

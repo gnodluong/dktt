@@ -22,7 +22,7 @@ ngay trên điện thoại.
 Quy tắc mặc định (sửa được trong bảng `settings`):
 
 - **Thứ Bảy và Chủ nhật mở tiếp hằng tuần.** Không cần bật gì.
-- Đăng ký ngày mai đóng lúc **20:00 hôm trước** (`cutoff_hour`).
+- Phải đăng ký **trước ít nhất 2 ngày** (`min_lead_days`) để đơn vị chốt cơm; đăng ký sát 1 ngày không nhận.
 - **Không giới hạn lượt cuối tuần** (`capacity.weekend = 0`); đặt số dương nếu muốn chặn.
   **6 suất đột xuất/ngày** (`capacity.urgent`).
 - Ngày bị thông báo tạm dừng thì không nhận phiếu, kể cả phiếu đã có sẵn.

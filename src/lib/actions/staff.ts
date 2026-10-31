@@ -215,16 +215,23 @@ export async function saveCapacity(
   await requireStaff();
   const weekend = Number(fd.get("weekend"));
   const urgent = Number(fd.get("urgent"));
+  const lead = Number(fd.get("lead"));
   if (!Number.isInteger(weekend) || weekend < 0 || weekend > 2000) {
     return { error: "Số lượt mỗi ngày phải từ 0 đến 2000 (0 = không giới hạn)." };
   }
   if (!Number.isInteger(urgent) || urgent < 0 || urgent > 500) {
     return { error: "Suất đột xuất phải từ 0 đến 500." };
   }
+  if (!Number.isInteger(lead) || lead < 0 || lead > 14) {
+    return { error: "Số ngày báo trước phải từ 0 đến 14." };
+  }
   const { error } = await admin()
     .from("settings")
-    .upsert({ key: "capacity", value: { weekend, urgent } });
-  if (error) return { error: "Chưa lưu được sức chứa." };
+    .upsert([
+      { key: "capacity", value: { weekend, urgent } },
+      { key: "min_lead_days", value: lead },
+    ]);
+  if (error) return { error: "Chưa lưu được cấu hình." };
   revalidateTag("settings", "max");
   revalidateTag("days", "max");
   revalidatePath("/chi-huy/cai-dat");
@@ -235,9 +242,10 @@ export async function saveCapacity(
   return {
     ok: true,
     notice:
-      weekend > 0
+      (weekend > 0
         ? `Đã đặt ${weekend} lượt/ngày và ${urgent} suất đột xuất/ngày.`
-        : `Không giới hạn lượt cuối tuần; ${urgent} suất đột xuất/ngày.`,
+        : `Không giới hạn lượt cuối tuần; ${urgent} suất đột xuất/ngày.`) +
+      ` Báo trước ${lead} ngày.`,
   };
 }
 

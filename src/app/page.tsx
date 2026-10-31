@@ -6,6 +6,7 @@ import { getDays, getNotices, getRequestByCode, getSettings } from "@/lib/data";
 import { RESULT_COOKIE } from "@/lib/session";
 import {
   STATUS_LABEL,
+  diffDays,
   longDate,
   monthDay,
   timeText,
@@ -17,12 +18,23 @@ import {
 
 export const dynamic = "force-dynamic";
 
-function stateOf(day: { closed: boolean; loaded: number; capacity: number }) {
+function stateOf(
+  day: { date: string; closed: boolean; loaded: number; capacity: number },
+  minLeadDays: number,
+  today: string,
+) {
   if (day.closed)
     return { state: "closed", text: "Tạm dừng tiếp", sub: "Theo thông báo của đơn vị" };
   const limited = day.capacity > 0;
   if (limited && day.loaded >= day.capacity)
     return { state: "full", text: "Đã đủ lượt", sub: `${day.loaded}/${day.capacity} lượt` };
+  if (diffDays(today, day.date) < minLeadDays) {
+    return {
+      state: "late",
+      text: "Hết hạn đăng ký",
+      sub: `Cần báo trước ${minLeadDays} ngày`,
+    };
+  }
   return {
     state: "open",
     text: "Mở đăng ký",
@@ -78,7 +90,7 @@ export default async function Home() {
 
             <div className="board">
               {board.map((d) => {
-                const s = stateOf(d);
+                const s = stateOf(d, settings.minLeadDays, today);
                 const common = (
                   <>
                     <span className="wd">{weekdayName(d.date)}</span>
@@ -87,7 +99,7 @@ export default async function Home() {
                     <span className="sub">{s.sub}</span>
                   </>
                 );
-                return d.closed ? (
+                return d.closed || s.state === "late" ? (
                   <div key={d.date} className="board-day" data-state={s.state}>
                     {common}
                   </div>

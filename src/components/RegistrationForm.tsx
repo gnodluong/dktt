@@ -38,6 +38,7 @@ export function RegistrationForm({
   defaultDate,
   minDate,
   maxDate,
+  minLeadDays = 2,
 }: {
   kind: "weekend" | "urgent";
   soldiers: Soldier[];
@@ -47,6 +48,7 @@ export function RegistrationForm({
   defaultDate?: string;
   minDate?: string;
   maxDate?: string;
+  minLeadDays?: number;
 }) {
   const [state, action, pending] = useActionState<FormState | null, FormData>(
     submitVisit,
@@ -139,8 +141,9 @@ export function RegistrationForm({
           <div className="alert" data-tone="error">
             <AlertCircle size={17} aria-hidden />
             <span>
-              Hiện không có ngày nào mở tiếp thân nhân. Theo dõi mục Thông báo
-              hoặc liên hệ ban chỉ huy đại đội.
+              Hiện chưa có ngày nào đủ điều kiện đăng ký. Đơn vị cần báo trước{" "}
+              {minLeadDays} ngày để chốt cơm và chuẩn bị — chọn ngày xa hơn hoặc
+              liên hệ ban chỉ huy đại đội.
             </span>
           </div>
         ) : (
