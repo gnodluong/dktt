@@ -1507,6 +1507,112 @@ a.board-day:hover {
   height: 19px;
 }
 
+/* --------------------------------------------------------- install guide */
+.install-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(18, 23, 21, 0.55);
+  display: grid;
+  place-items: end center;
+}
+
+.install-sheet {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 14px 14px 0 0;
+  padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 12px;
+  max-height: 92dvh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+}
+
+@media (min-width: 560px) {
+  .install-backdrop {
+    place-items: center;
+    padding: 20px;
+  }
+
+  .install-sheet {
+    border-radius: 14px;
+  }
+}
+
+.install-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.install-head img {
+  border-radius: 8px;
+  flex: none;
+}
+
+.install-head h2 {
+  font-size: 1.05rem;
+}
+
+.install-close {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.install-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.install-steps li {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9375rem;
+  align-items: start;
+}
+
+.install-steps li:last-child {
+  border-bottom: 0;
+}
+
+.install-steps .n {
+  font-family: var(--font-cond), "Arial Narrow", sans-serif;
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.install-steps svg {
+  display: inline-block;
+  vertical-align: -2px;
+}
+
+.install-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.install-actions .btn {
+  flex: 1 1 auto;
+}
+
 /* ------------------------------------------------------------------- misc */
 .empty {
   padding: 30px 0 26px;

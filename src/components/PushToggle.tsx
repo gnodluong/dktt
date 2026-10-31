@@ -124,10 +124,19 @@ export function PushToggle({
 
   if (state === "ios") {
     return (
-      <p className="small muted">
-        Trên iPhone: bấm <b>Chia sẻ</b> → <b>Thêm vào Màn hình chính</b>, mở lại
-        ứng dụng rồi bật thông báo.
-      </p>
+      <div className="stack-sm">
+        <p className="small muted">
+          Trên iPhone, thông báo chỉ hoạt động khi app đã được thêm vào Màn hình
+          chính.
+        </p>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => window.dispatchEvent(new Event("dktt:install"))}
+        >
+          Xem cách thêm vào Màn hình chính
+        </button>
+      </div>
     );
   }
 

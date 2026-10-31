@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import { SwRegister } from "@/components/SwRegister";
+import { InstallGuide } from "@/components/InstallGuide";
 
 const sans = Be_Vietnam_Pro({
   subsets: ["vietnamese", "latin"],
@@ -58,6 +59,7 @@ export default function RootLayout({
       <body>
         {children}
         <SwRegister />
+        <InstallGuide />
       </body>
     </html>
   );
