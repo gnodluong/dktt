@@ -1,0 +1,194 @@
+import Link from "next/link";
+import { ArrowRight, Megaphone } from "lucide-react";
+import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import { getDays, getNotices, getSettings } from "@/lib/data";
+import {
+  longDate,
+  monthDay,
+  todayVN,
+  upcomingWeekend,
+  weekdayName,
+  weekdayShort,
+} from "@/lib/domain";
+
+export const dynamic = "force-dynamic";
+
+function stateOf(day: {
+  closed: boolean;
+  loaded: number;
+  capacity: number;
+}): { state: "open" | "closed" | "full"; text: string; sub: string } {
+  if (day.closed) return { state: "closed", text: "Tạm dừng tiếp", sub: "Theo thông báo của đơn vị" };
+  if (day.loaded >= day.capacity)
+    return { state: "full", text: "Đã đủ lượt", sub: `${day.loaded}/${day.capacity} lượt` };
+  return {
+    state: "open",
+    text: "Mở đăng ký",
+    sub: `${day.loaded}/${day.capacity} lượt đã duyệt`,
+  };
+}
+
+export default async function Home() {
+  const today = todayVN();
+  const [sat, sun] = upcomingWeekend(today);
+  const [days, notices, settings] = await Promise.all([
+    getDays(3),
+    getNotices(3),
+    getSettings(),
+  ]);
+
+  const find = (d: string) =>
+    days.find((x) => x.date === d) ?? {
+      date: d,
+      closed: false,
+      reason: null as string | null,
+      partial: [] as string[],
+      partialReason: null as string | null,
+      loaded: 0,
+      capacity: settings.capacity.weekend * 2,
+    };
+
+  const board = [find(sat), find(sun)];
+  const closure = board.find((d) => d.closed);
+  const partial = board.find((d) => d.partial.length > 0);
+
+  return (
+    <>
+      <SiteHeader />
+      <main className="page">
+        <div className="wrap stack-lg">
+          <section className="stack">
+            <div className="stack-sm">
+              <h1>Tiếp thân nhân</h1>
+              <p className="lead">
+                Đăng ký trước để trực ban đại đội chuẩn bị đón tiếp. Thứ Bảy và
+                Chủ nhật mở sổ hằng tuần; việc gấp thì gửi đơn đột xuất để chỉ
+                huy duyệt.
+              </p>
+              <p className="small muted">Hôm nay {longDate(today)}</p>
+            </div>
+
+            <div className="board">
+              {board.map((d) => {
+                const s = stateOf(d);
+                const href = `/dang-ky?ngay=${d.date}`;
+                const common = (
+                  <>
+                    <span className="wd">{weekdayName(d.date)}</span>
+                    <span className="num">{monthDay(d.date)}</span>
+                    <span className="status">{s.text}</span>
+                    <span className="sub">{s.sub}</span>
+                  </>
+                );
+                return d.closed ? (
+                  <div key={d.date} className="board-day" data-state={s.state}>
+                    {common}
+                  </div>
+                ) : (
+                  <Link
+                    key={d.date}
+                    href={href}
+                    className="board-day"
+                    data-state={s.state}
+                    aria-label={`Đăng ký thăm ${weekdayName(d.date)} ${monthDay(d.date)}`}
+                  >
+                    {common}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {closure ? (
+              <p className="weekend-note">
+                <Megaphone size={15} aria-hidden style={{ display: "inline", verticalAlign: "-2px", marginRight: 6 }} />
+                {weekdayName(closure.date)} {monthDay(closure.date)} tạm dừng tiếp:{" "}
+                <b>{closure.reason}</b>.
+              </p>
+            ) : null}
+
+            {partial ? (
+              <p className="weekend-note">
+                <Megaphone size={15} aria-hidden style={{ display: "inline", verticalAlign: "-2px", marginRight: 6 }} />
+                {partial.partialReason} — áp dụng cho lớp{" "}
+                <b>{partial.partial.join(", ")}</b>.
+              </p>
+            ) : null}
+
+            <div className="actions">
+              <Link href="/dang-ky" className="btn btn-primary btn-lg">
+                Đăng ký thăm thân
+                <ArrowRight size={18} aria-hidden />
+              </Link>
+              <Link href="/tra-cuu" className="btn btn-ghost btn-lg">
+                Tra cứu phiếu
+              </Link>
+            </div>
+
+            <p className="small muted">
+              Có việc gấp trong ngày?{" "}
+              <Link href="/dang-ky/dot-xuat" style={{ fontWeight: 650 }}>
+                Gửi đơn đăng ký đột xuất
+              </Link>
+              . Đơn cần chỉ huy xác nhận trước khi vào cổng.
+            </p>
+          </section>
+
+          {notices.length > 0 ? (
+            <section className="stack">
+              <div className="sec-head">
+                <h2>Thông báo từ đại đội</h2>
+                <Link href="/thong-bao">Xem tất cả</Link>
+              </div>
+              <div>
+                {notices.map((n) => (
+                  <Link key={n.id} href={`/thong-bao/${n.id}`} className="notice-item">
+                    <span className="meta">
+                      {n.kind === "closure" ? <span className="tag">Tạm dừng tiếp</span> : null}
+                      {n.start_date && n.end_date ? (
+                        <span>
+                          {monthDay(n.start_date)} – {monthDay(n.end_date)}
+                        </span>
+                      ) : null}
+                    </span>
+                    <h3>{n.title}</h3>
+                    <p>{n.body.slice(0, 150)}{n.body.length > 150 ? "…" : ""}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="stack">
+            <div className="sec-head">
+              <h2>Khi đến đơn vị</h2>
+            </div>
+            <ol className="steps">
+              <li>
+                <span className="n">01</span>
+                <span>
+                  <b>Đăng ký trước.</b> Gửi phiếu trước 20:00 hôm trước, hoặc
+                  gửi đơn đột xuất nếu có việc gấp.
+                </span>
+              </li>
+              <li>
+                <span className="n">02</span>
+                <span>
+                  <b>Chờ chỉ huy duyệt.</b> Bật thông báo đẩy để nhận kết quả
+                  ngay trên điện thoại.
+                </span>
+              </li>
+              <li>
+                <span className="n">03</span>
+                <span>
+                  <b>Đến cổng đúng giờ.</b> Xuất trình phiếu (mã QR) và căn
+                  cước; số người đi cùng phải đúng như khai.
+                </span>
+              </li>
+            </ol>
+          </section>
+        </div>
+      </main>
+      <SiteFooter hotline={settings.unit.hotline} />
+    </>
+  );
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Tiếp thân nhân · Đại đội 5",
+  "short_name": "Tiếp thân nhân",
+  "description": "Đăng ký và xác nhận tiếp thân nhân quân nhân Đại đội 5.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "vi",
+  "background_color": "#eff0e8",
+  "theme_color": "#3e4c34",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
